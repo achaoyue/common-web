@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>antd</title>
+  <link crossorigin="anonymous" integrity="sha384-uXXJbwsZ8q1IOYVnUe1ElcIcWqild61mKr+99JlWEvvIu0kBIL2BKOvOeeCprmLN" href="https://lib.baomitu.com/antd/4.4.2/antd.min.css" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://cdn.bootcss.com/babel-standalone/6.26.0/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+  <script crossorigin="anonymous" integrity="sha384-I3Sdx6S5oXMd1zYjLEUJlUmVNFSL6WrhTfZtG9+VLKBv8ORVmSfgxE5HiJmNtLxl" src="https://lib.baomitu.com/antd/4.4.2/antd.min.js"></script>
+</head>
+
+<body>
+<script type="text/babel">
+  Object.keys(antd).forEach(function (key) {
+    window[key] = antd[key]
+  })
+  class M extends React.Component{
+
+    render() {
+      return (
+          <div>
+
+          </div>
+      );
+    }
+  }
+  class MessageBox extends React.Component{
+    constructor(props) {
+      super(props);
+      window.fff = ()=>{
+        this.setState({});
+      }
+    }
+
+    onClick = ()=>{
+      let a = this.createEle(data);
+      console.log(a);
+      this.setState({})
+    }
+    render = ()=>{
+      return ( <div>
+        <Button type="primary" onClick={this.onClick}>aaaaa</Button>
+        <M/>
+      </div> )
+    }
+
+    createEle = (data)=>{
+      console.log(data);
+      if(data.lable == "txt"){
+        return data.content;
+      }
+      let children = [];
+      if(data.children){
+        children = data.children.map(e=>{
+          return this.createEle(e);
+        })
+      }
+      return  React.createElement(data.lable,data.attr,children);
+    }
+  }
+  ReactDOM.render( <MessageBox/>,
+      document.getElementById('app'),
+  )
+</script>
+<script type="text/javascript">
+  dataSource = [
+    {
+      key: '1',
+      name: '胡彦斌',
+      age: 32,
+      address: '西湖区湖底公园1号',
+    },
+    {
+      key: '2',
+      name: '胡彦祖',
+      age: 42,
+      address: '西湖区湖底公园1号',
+    },
+  ];
+  columns = [
+    {
+      title: '姓名',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: '年龄',
+      dataIndex: 'age',
+      key: 'age',
+    },
+    {
+      title: '住址',
+      dataIndex: 'address',
+      key: 'address',
+    },
+  ];
+
+  data ={
+    lable:"div",
+    attr:{
+
+    },
+
+  children:[{
+    "lable": "Form",
+    "attr":{
+      "layout":"inline"
+    },
+    "children": [
+      {
+        "lable": "Form.Item",
+        "attr":{
+          label:"Form Layout",
+          name:"layout"
+        },
+        "children": [
+          {
+            "lable": "Input",
+            "closeSelf":true,
+            "children": [
+
+            ]
+          }
+        ]
+      },{
+        "lable": "Form.Item",
+        "attr":{
+          label:"Form Layout",
+          name:"layout"
+        },
+        "children": [
+          {
+            "lable": "Input",
+            attr:{
+              "type":"text"
+            },
+            "closeSelf":true,
+            "children": [
+
+            ]
+          }
+        ]
+      },{
+        "lable": "Form.Item",
+        "attr":{
+          name:"layout"
+        },
+        "children": [
+          {
+            "lable": "Button",
+            "attr":{
+              "type":"primary"
+            },
+            "children": [
+              {
+                "lable":"txt",
+                "content":"提交"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },{
+    lable:"Table",
+    "attr":{
+      dataSource:"{dataSource}",
+      columns:"{columns}"
+    },
+    children:[]
+  }]};
+
+  function print(data) {
+    if(data instanceof Array){
+      var s="";
+      for(index in data){
+        s += print(data[index]);
+      }
+      return s;
+    }
+    if(data.lable == 'txt'){
+      return " "+ data.content+" ";
+    }
+    return  "<"+data.lable+attr(data.attr)+(data.closeSelf?"/>":">")
+        + (data.closeSelf?"": print(data.children))
+    +(data.closeSelf ? "": "</"+data.lable+">")
+  }
+
+  function attr(data) {
+    if(!data){
+      return " ";
+    }
+    var s = " ";
+    Object.keys(data).map(function (key) {
+      if(data[key].startsWith("{")){
+        s += (key+"="+data[key]+"")+" ";
+      }else{
+        s += (key+"='"+data[key]+"'")+" ";
+      }
+    })
+    return  s;
+  }
+
+  console.log( print(data));
+
+  var sc = document.createElement("script");
+  sc.setAttribute("type","text/babel");
+  sc.innerText = "class M extends React.Component{"
+      + "    render() {"
+      + "      return ("
+      + "          <div>"
+      + "            "+print(data)
+      + "          </div>"
+      + "      );"
+      + "    }"
+      + "  }"
+  sc.setAttribute("id","123");
+  document.body.appendChild(sc);
+
+
+</script>
+<div id="app"></div>
+</body>
+
+</html>
