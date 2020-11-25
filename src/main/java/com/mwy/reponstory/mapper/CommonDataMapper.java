@@ -21,9 +21,9 @@ public interface CommonDataMapper {
      * @return
      */
     @Select("${sql}")
-    List<Map<String,String>> select(@Param("sql") String sql,@Param("param") Map<String,String> param);
+    List<Map<String,String>> select(@Param("sql") String sql,@Param("param") Map<Object,Object> param);
 
     @Insert("${sql}")
     @SelectKey(statement="SELECT LAST_INSERT_ID()",keyColumn = "id" ,keyProperty="param.id", before=false, resultType=String.class)
-    Integer insert(@Param("sql")String sqlText,@Param("param") Map<String, String> param);
+    Integer insert(@Param("sql")String sqlText,@Param("param") Map<Object, Object> param);
 }

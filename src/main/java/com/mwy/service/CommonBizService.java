@@ -9,19 +9,8 @@ import java.util.Map;
  */
 public interface CommonBizService {
 
-    /**
-     *  查询详情
-     * @param user
-     * @param tableId
-     * @param method
-     * @param param
-     * @return
-     */
-    Object query(String user, Long tableId, String method, Map<String, String> param);
+    List<Map<String,String>> queryBySql(String user, Long tableId, String method, Map<Object, Object> param);
 
-
-    List<Map<String,String>> queryBySql(String user, Long tableId, String method, Map<String, String> param);
-
-    Object save(String user, Long tableId, String method, Map<String, String> param);
+    Object save(String user, Long tableId, String method, Map<Object, Object> param);
 
 }
