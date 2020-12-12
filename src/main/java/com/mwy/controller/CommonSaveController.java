@@ -1,9 +1,11 @@
 package com.mwy.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.mwy.service.CommonBizService;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,5 +40,15 @@ public class CommonSaveController {
         @PathVariable("method") String method,
         @RequestBody HashMap<Object,Object> param){
         return commonBizService.save(user,table,method,param);
+    }
+
+    @GetMapping("/test/{id}")
+    public Object get(@PathVariable("id")Long id, HttpServletRequest request){
+        return commonBizService.exe(id,request);
+    }
+
+    @PostMapping("/test/{id}")
+    public Object post(@PathVariable("id")Long id, @RequestBody JSONObject object){
+        return commonBizService.exec(id,object);
     }
 }
