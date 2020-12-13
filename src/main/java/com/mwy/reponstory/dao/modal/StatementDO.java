@@ -15,6 +15,8 @@ public class StatementDO {
     @KeySql(useGeneratedKeys = true)
     private Long id;
 
+    private String uniqKey;
+
     private String statementId;
 
     private String type;

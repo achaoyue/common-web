@@ -43,12 +43,12 @@ public class CommonSaveController {
     }
 
     @GetMapping("/test/{id}")
-    public Object get(@PathVariable("id")Long id, HttpServletRequest request){
+    public Object get(@PathVariable("id")String id, HttpServletRequest request){
         return commonBizService.exe(id,request);
     }
 
-    @PostMapping("/test/{id}")
-    public Object post(@PathVariable("id")Long id, @RequestBody JSONObject object){
-        return commonBizService.exec(id,object);
+    @PostMapping("/test/{key}")
+    public Object post(@PathVariable("key")String key, @RequestBody JSONObject object){
+        return commonBizService.exec(key,object);
     }
 }

@@ -11,6 +11,7 @@ import com.mwy.component.modal.ParamConfigModal;
 import com.mwy.reponstory.dao.FiledDao;
 import com.mwy.reponstory.dao.QueryDao;
 import com.mwy.reponstory.dao.SqlQueryDao;
+import com.mwy.reponstory.dao.StatementDao;
 import com.mwy.reponstory.dao.TableDao;
 import com.mwy.reponstory.dao.UserDao;
 import com.mwy.reponstory.dao.modal.SqlQueryDO;
@@ -61,6 +62,8 @@ public class CommonBizServiceImpl implements CommonBizService {
     StatementMapper statementMapper;
     @Resource
     StatementXmlMapper statementXmlMapper;
+    @Resource
+    StatementDao statementDao;
 
     @Override
     public List<Map<String,String>> queryBySql(String user, Long tableId, String method, Map<Object, Object> param) {
@@ -111,8 +114,9 @@ public class CommonBizServiceImpl implements CommonBizService {
     }
 
     @Override
-    public Object exe(Long id, HttpServletRequest request){
-        StatementDO statementDO = statementMapper.selectByPrimaryKey(id);
+    public Object exe(String uqKey, HttpServletRequest request){
+        StatementDO statementDO = statementDao.getByUniqKey(uqKey);
+
         List<ParamConfigModal> paramConfigModals = JSON.parseObject(statementDO.getDefaultParam(),
             new TypeReference<List<ParamConfigModal>>() {
             });
@@ -158,8 +162,8 @@ public class CommonBizServiceImpl implements CommonBizService {
     }
 
     @Override
-    public Object exec(Long id, JSONObject map){
-        StatementDO statementDO = statementMapper.selectByPrimaryKey(id);
+    public Object exec(String id, JSONObject map){
+        StatementDO statementDO = statementDao.getByUniqKey(id);
         List<ParamConfigModal> paramConfigModals = JSON.parseObject(statementDO.getDefaultParam(),
             new TypeReference<List<ParamConfigModal>>() {
             });
@@ -195,6 +199,13 @@ public class CommonBizServiceImpl implements CommonBizService {
                 }else if(e.getDefaultValue() != null){
                     param.put(e.getParamName(),e.getDefaultValue());
                 }
+            }
+        });
+        //必填校验
+        paramConfigModals.stream().forEach(e->{
+            if(Boolean.TRUE.equals(e.getRequired())
+                && param.get(e.getParamName())==null){
+                throw new RuntimeException("参数必填:"+e.getParamPath());
             }
         });
 

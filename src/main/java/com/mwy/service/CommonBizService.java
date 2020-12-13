@@ -15,7 +15,7 @@ public interface CommonBizService {
 
     Object save(String user, Long tableId, String method, Map<Object, Object> param);
 
-    Object exe(Long id, HttpServletRequest request);
+    Object exe(String id, HttpServletRequest request);
 
-    Object exec(Long id, JSONObject map);
+    Object exec(String id, JSONObject map);
 }

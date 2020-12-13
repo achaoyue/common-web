@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ControllerAdvice {
 
     @ExceptionHandler(Exception.class)
-    public Object excepton(Exception e){
+    public Object exception(Exception e){
         log.error("系统错误",e);
         Map<String,String> map = new HashMap<>();
         map.put("msg",e.getMessage());
+        map.put("code","500");
         return map;
     }
 

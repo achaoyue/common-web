@@ -11,4 +11,5 @@ public class ParamConfigModal {
     Object defaultValue;
     String paramPath;
     String paramName;
+    Boolean required;
 }
