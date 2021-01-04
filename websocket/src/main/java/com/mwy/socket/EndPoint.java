@@ -84,7 +84,7 @@ public class EndPoint extends Player{
         try {
             if(this.session.isOpen()){
                 synchronized (this.session){
-                    this.session.getAsyncRemote().sendText(msg);
+                    this.session.getBasicRemote().sendText(msg);
                 }
             }else {
                 MwyMap.remove(this);
