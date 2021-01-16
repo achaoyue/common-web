@@ -38,7 +38,7 @@ public abstract class Player {
         JoinCmd newJoinCmd = new JoinCmd();
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
-                List<Player> players = MwyMap.get(i * 320 + x, j * 320 + y);
+                List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
                         e.sendMsg(joinMsg);
@@ -56,7 +56,7 @@ public abstract class Player {
         String leaveMsg = JSON.toJSONString(leaveCmd);
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
-                List<Player> players = MwyMap.get(i * 320 + x, j * 320 + y);
+                List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
                         e.sendMsg(leaveMsg);
@@ -78,7 +78,7 @@ public abstract class Player {
         String moveMsg = JSON.toJSONString(moveCmd);
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
-                List<Player> players = MwyMap.get(i * 320 + x, j * 320 + y);
+                List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
                         e.sendMsg(moveMsg);
@@ -93,7 +93,7 @@ public abstract class Player {
         String textMsg = JSON.toJSONString(textCmd);
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
-                List<Player> players = MwyMap.get(i * 320 + x, j * 320 + y);
+                List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
                         e.sendMsg(textMsg);

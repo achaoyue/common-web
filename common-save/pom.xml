@@ -11,6 +11,7 @@
 
     <groupId>com.mwy</groupId>
     <artifactId>common-save</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
 
