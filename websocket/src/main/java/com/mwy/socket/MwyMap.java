@@ -39,18 +39,8 @@ public class MwyMap {
         long newKey = buildKey(x,y);
         long oldKey = buildKey(player.getX(),player.getY());
         //未移出块则不移动了。
-        if(newKey == oldKey){
+        if(newKey == oldKey && map.containsKey(oldKey)){
             return;
-        }
-
-        //添加到新块
-        synchronized (map){
-            List<Player> endPoints = map.get(newKey);
-            if(CollectionUtils.isEmpty(endPoints)){
-                endPoints = new LinkedList<>();
-                map.put(newKey,endPoints);
-            }
-            endPoints.add(player);
         }
 
         //从老块移除
@@ -63,10 +53,24 @@ public class MwyMap {
                 }
             }
         }
+
+        //添加到新块
+        synchronized (map){
+            List<Player> endPoints = map.get(newKey);
+            if(CollectionUtils.isEmpty(endPoints)){
+                endPoints = new LinkedList<>();
+                map.put(newKey,endPoints);
+            }
+            endPoints.add(player);
+        }
     }
 
     public static long format(int x){
-        return x / width * width;
+        long l = x;
+        if(x<0){
+            l = x - width;
+        }
+        return l / width * width;
     }
 
     private static long buildKey(int x,int y){

@@ -25,7 +25,8 @@ public abstract class Player {
 
     public void join(JoinCmd joinCmd){
         //加入
-        MwyMap.save(1,1,this);
+        MwyMap.save(joinCmd.getTargetX(),joinCmd.getTargetY(),this);
+
         this.x = joinCmd.getTargetX();
         this.y = joinCmd.getTargetY();
         this.dirX = joinCmd.getDirX();
@@ -45,10 +46,10 @@ public abstract class Player {
                         newJoinCmd.fillByPlayer(e);
                         sendMsg(JSON.toJSONString(newJoinCmd));
                     });
-
                 }
             }
         }
+
     }
 
     public void leave(LeaveCmd leaveCmd){

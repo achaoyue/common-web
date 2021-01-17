@@ -31,8 +31,8 @@ public class EndPoint extends Player{
         this.session = session;
         JoinCmd joinCmd = new JoinCmd();
         joinCmd.setId(Double.valueOf(Math.random()*10000000).intValue());
-        joinCmd.setTargetX(20);
-        joinCmd.setTargetY(20);
+        joinCmd.setTargetX(-640);
+        joinCmd.setTargetY(-1136);
         joinCmd.setDirX((byte) 13);
         joinCmd.setDirY((byte) 13);
         joinCmd.setPic("turtle2_png");
