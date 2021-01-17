@@ -14,25 +14,28 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author mouwenyao 2021/1/1 11:12 下午
  */
 @Slf4j
 @Component
-@ServerEndpoint( value = "/websocket" )
+@ServerEndpoint( value = "/websocket/{worldX}/{worldY}" )
 public class EndPoint extends Player{
     Session session;
     @OnOpen
-    public void onOpen(Session session){
+    public void onOpen(@PathParam("worldX") int worldX,@PathParam("worldY")int worldY, Session session){
         this.session = session;
         JoinCmd joinCmd = new JoinCmd();
         joinCmd.setId(Double.valueOf(Math.random()*10000000).intValue());
-        joinCmd.setTargetX(-640);
-        joinCmd.setTargetY(-1136);
+        joinCmd.setTargetX(worldX);
+        joinCmd.setTargetY(worldY);
         joinCmd.setDirX((byte) 13);
         joinCmd.setDirY((byte) 13);
         joinCmd.setPic("turtle2_png");

@@ -21,7 +21,7 @@ public class MwyMap {
         if(CollectionUtils.isEmpty(players)){
             return Collections.emptyList();
         }
-        System.out.println(x+"_"+y+"_"+Long.toHexString(key));
+//        System.out.println(x+"_"+y+"_"+Long.toHexString(key));
         return new ArrayList<>(players);
     }
 
@@ -35,11 +35,11 @@ public class MwyMap {
         }
     }
 
-    public static void save(int x,int y,Player player){
+    public static void save(int x,int y,Player player,boolean force){
         long newKey = buildKey(x,y);
         long oldKey = buildKey(player.getX(),player.getY());
         //未移出块则不移动了。
-        if(newKey == oldKey && map.containsKey(oldKey)){
+        if(newKey == oldKey && !force){
             return;
         }
 

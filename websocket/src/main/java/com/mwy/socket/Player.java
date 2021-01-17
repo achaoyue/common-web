@@ -25,7 +25,7 @@ public abstract class Player {
 
     public void join(JoinCmd joinCmd){
         //加入
-        MwyMap.save(joinCmd.getTargetX(),joinCmd.getTargetY(),this);
+        MwyMap.save(joinCmd.getTargetX(),joinCmd.getTargetY(),this,true);
 
         this.x = joinCmd.getTargetX();
         this.y = joinCmd.getTargetY();
@@ -69,7 +69,7 @@ public abstract class Player {
     }
 
     public void move(MoveCmd moveCmd){
-        MwyMap.save(moveCmd.getTargetX(),moveCmd.getTargetY(),this);
+        MwyMap.save(moveCmd.getTargetX(),moveCmd.getTargetY(),this,false);
 
         this.x = moveCmd.getTargetX();
         this.y = moveCmd.getTargetY();
