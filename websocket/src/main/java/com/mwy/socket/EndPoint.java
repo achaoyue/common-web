@@ -2,6 +2,7 @@ package com.mwy.socket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mwy.socket.cmd.AbstractCmd;
 import com.mwy.socket.cmd.JoinCmd;
 import com.mwy.socket.cmd.LeaveCmd;
 import com.mwy.socket.cmd.MoveCmd;
@@ -83,11 +84,11 @@ public class EndPoint extends Player{
     }
 
     @Override
-    public void sendMsg(String msg) {
+    public void sendMsg(AbstractCmd cmd) {
         try {
             if(this.session.isOpen()){
                 synchronized (this.session){
-                    this.session.getBasicRemote().sendText(msg);
+                    this.session.getBasicRemote().sendText(JSON.toJSONString(cmd));
                 }
             }else {
                 MwyMap.remove(this);

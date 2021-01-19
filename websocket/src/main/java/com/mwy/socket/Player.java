@@ -1,6 +1,7 @@
 package com.mwy.socket;
 
 import com.alibaba.fastjson.JSON;
+import com.mwy.socket.cmd.AbstractCmd;
 import com.mwy.socket.cmd.JoinCmd;
 import com.mwy.socket.cmd.LeaveCmd;
 import com.mwy.socket.cmd.MoveCmd;
@@ -35,16 +36,15 @@ public abstract class Player {
         this.id = joinCmd.getId();
 
         //通知其他人加入
-        String joinMsg = JSON.toJSONString(joinCmd);
         JoinCmd newJoinCmd = new JoinCmd();
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
                 List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
-                        e.sendMsg(joinMsg);
+                        e.sendMsg(joinCmd);
                         newJoinCmd.fillByPlayer(e);
-                        sendMsg(JSON.toJSONString(newJoinCmd));
+                        sendMsg(newJoinCmd);
                     });
                 }
             }
@@ -54,13 +54,12 @@ public abstract class Player {
 
     public void leave(LeaveCmd leaveCmd){
         MwyMap.remove(this);
-        String leaveMsg = JSON.toJSONString(leaveCmd);
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
                 List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
-                        e.sendMsg(leaveMsg);
+                        e.sendMsg(leaveCmd);
                     });
 
                 }
@@ -76,13 +75,12 @@ public abstract class Player {
         this.dirY = moveCmd.getDirY();
         this.dirX = moveCmd.getDirX();
 
-        String moveMsg = JSON.toJSONString(moveCmd);
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
                 List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
-                        e.sendMsg(moveMsg);
+                        e.sendMsg(moveCmd);
                     });
 
                 }
@@ -91,13 +89,12 @@ public abstract class Player {
     }
 
     public void text(TextCmd textCmd){
-        String textMsg = JSON.toJSONString(textCmd);
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
                 List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
-                        e.sendMsg(textMsg);
+                        e.sendMsg(textCmd);
                     });
 
                 }
@@ -105,5 +102,5 @@ public abstract class Player {
         }
     }
 
-    public abstract void sendMsg(String msg);
+    public abstract void sendMsg(AbstractCmd msg);
 }

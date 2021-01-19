@@ -10,6 +10,10 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class AbstractCmd {
+
+    /**
+     * 命令发出玩家id
+     */
     int id;
     public abstract byte getType();
 }
