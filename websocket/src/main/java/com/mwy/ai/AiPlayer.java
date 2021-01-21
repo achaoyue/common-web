@@ -23,6 +23,7 @@ public class AiPlayer extends Player implements AbstractAi {
     private volatile LatestPlayer latestPlayer;
     MoveCmd moveCmd = new MoveCmd();
     double moveDir = Math.PI/4;
+    long lastFlushTime = 0;
 
     @Override
     public void sendMsg(AbstractCmd msg) {
@@ -65,6 +66,7 @@ public class AiPlayer extends Player implements AbstractAi {
 
         synchronized (this){
             if(this.latestPlayer == null){
+                this.flush();
                 return;
             }else{
                 temp = latestPlayer;
@@ -75,15 +77,32 @@ public class AiPlayer extends Player implements AbstractAi {
             .getDistance(this.getX(), this.getY(), temp.getTargetX(), temp.getTargetY());
         if(distance > maxDistance*3){
             this.latestPlayer = null;
+            this.flush();
             return;
         }
         //向更远距离移动
         moveCmd.setId(this.getId());
-        moveCmd.setDirX((byte)128);
-        moveCmd.setDirY((byte) (Math.tan(moveDir)*128));
+        moveCmd.setDirX((byte)64);
+        if(moveDir>Math.PI/2 && moveDir<Math.PI*3/4){
+            moveCmd.setDirX((byte)-64);
+        }
+        moveCmd.setDirY((byte) (Math.tan(Math.PI/2 - moveDir)*moveCmd.getDirX()));
         moveCmd.setTargetX((int) (Math.cos(moveDir)*speed +this.getX()));
         moveCmd.setTargetY((int) (Math.sin(moveDir)*speed +this.getY()));
         this.move(moveCmd);
+        lastFlushTime = System.currentTimeMillis();
+    }
+
+    public void flush(){
+        if(System.currentTimeMillis()-lastFlushTime > 1000*5){
+            moveCmd.setId(this.getId());
+            moveCmd.setDirX((byte)128);
+            moveCmd.setDirY((byte) (Math.tan(moveDir)*128));
+            moveCmd.setTargetX(this.getX());
+            moveCmd.setTargetY(this.getY());
+            this.move(moveCmd);
+            lastFlushTime = System.currentTimeMillis();
+        }
     }
 
     @Data

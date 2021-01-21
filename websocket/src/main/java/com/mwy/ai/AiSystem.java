@@ -14,18 +14,21 @@ public class AiSystem implements Runnable {
     private List<AbstractAi> aiList = new ArrayList<>();
 
     private AiSystem(){
-        Thread thread = new Thread(this);
-        thread.setDaemon(true);
-        thread.start();
     }
     public static AiSystem getInstance(){
         return INSTANCE;
     }
 
+    public void start(){
+        Thread thread = new Thread(this);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
 
     @Override
     public void run() {
-        log.info("start scaning....");
+        log.info("start scanning....");
         long start = System.currentTimeMillis();
         while (true){
             try {
@@ -38,13 +41,11 @@ public class AiSystem implements Runnable {
                 if(end - start > 40){
                     start = end;
                 }else{
-//                    log.info(end-start-40+"");
                     Thread.sleep(40+start-end);
                     start = start+40;
                 }
-//                log.info("scan ok");
             } catch (Exception e) {
-                log.error("失败:{}",e);
+                log.error("scanning 失败:",e);
             }
         }
     }

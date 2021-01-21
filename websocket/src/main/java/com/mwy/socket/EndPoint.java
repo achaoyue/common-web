@@ -7,9 +7,6 @@ import com.mwy.socket.cmd.JoinCmd;
 import com.mwy.socket.cmd.LeaveCmd;
 import com.mwy.socket.cmd.MoveCmd;
 import com.mwy.socket.cmd.TextCmd;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Random;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -19,8 +16,6 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author mouwenyao 2021/1/1 11:12 下午

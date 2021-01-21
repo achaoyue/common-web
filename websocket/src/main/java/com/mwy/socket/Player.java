@@ -1,6 +1,5 @@
 package com.mwy.socket;
 
-import com.alibaba.fastjson.JSON;
 import com.mwy.socket.cmd.AbstractCmd;
 import com.mwy.socket.cmd.JoinCmd;
 import com.mwy.socket.cmd.LeaveCmd;
@@ -54,17 +53,7 @@ public abstract class Player {
 
     public void leave(LeaveCmd leaveCmd){
         MwyMap.remove(this);
-        for (int i = -2; i < 3; i++) {
-            for(int j = -3 ;j< 4;j++){
-                List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
-                if(players != null){
-                    players.forEach(e->{
-                        e.sendMsg(leaveCmd);
-                    });
-
-                }
-            }
-        }
+        Notice(leaveCmd);
     }
 
     public void move(MoveCmd moveCmd){
@@ -75,26 +64,20 @@ public abstract class Player {
         this.dirY = moveCmd.getDirY();
         this.dirX = moveCmd.getDirX();
 
-        for (int i = -2; i < 3; i++) {
-            for(int j = -3 ;j< 4;j++){
-                List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
-                if(players != null){
-                    players.forEach(e->{
-                        e.sendMsg(moveCmd);
-                    });
-
-                }
-            }
-        }
+        Notice(moveCmd);
     }
 
     public void text(TextCmd textCmd){
+        Notice(textCmd);
+    }
+
+    private void Notice(AbstractCmd abstractCmd) {
         for (int i = -2; i < 3; i++) {
             for(int j = -3 ;j< 4;j++){
                 List<Player> players = MwyMap.get(i * MwyMap.width + x, j * MwyMap.width + y);
                 if(players != null){
                     players.forEach(e->{
-                        e.sendMsg(textCmd);
+                        e.sendMsg(abstractCmd);
                     });
 
                 }
