@@ -3,6 +3,8 @@ package com.mwy.socket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mwy.socket.cmd.AbstractCmd;
+import com.mwy.socket.cmd.CmdTypeEnum;
+import com.mwy.socket.cmd.FireCmd;
 import com.mwy.socket.cmd.JoinCmd;
 import com.mwy.socket.cmd.LeaveCmd;
 import com.mwy.socket.cmd.MoveCmd;
@@ -65,17 +67,22 @@ public class EndPoint extends Player{
         JSONObject jsonObject = JSON.parseObject(messages);
         Integer type = jsonObject.getInteger("type");
         //通知其他人移动
-        if(type == 2){
+        if(type == CmdTypeEnum.MOVE.getCode()){
             MoveCmd moveCmd = jsonObject.toJavaObject(MoveCmd.class);
             moveCmd.setId(this.getId());
             moveCmd.setPic(this.getPic());
             this.move(moveCmd);
         }
         //通知其他人消息
-        else if(type == 3){
+        else if(type == CmdTypeEnum.TEXT.getCode()){
             TextCmd textCmd = jsonObject.toJavaObject(TextCmd.class);
             textCmd.setId(this.getId());
             this.text(textCmd);
+        }//通知其他人消息
+        else if(type == CmdTypeEnum.FIRE.getCode()){
+            FireCmd fireCmd = jsonObject.toJavaObject(FireCmd.class);
+            fireCmd.setId(this.getId());
+            this.fire(fireCmd);
         }
     }
 

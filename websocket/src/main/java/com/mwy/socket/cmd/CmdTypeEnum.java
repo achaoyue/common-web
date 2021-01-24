@@ -13,6 +13,7 @@ public enum  CmdTypeEnum {
     MOVE((byte)2,"移动"),
     TEXT((byte)3,"消息"),
     LEAVE((byte)4,"退出"),
+    FIRE((byte)5,"开火"),
     ;
     byte code;
     String desc;

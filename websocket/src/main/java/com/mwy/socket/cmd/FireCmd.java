@@ -9,6 +9,8 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LeaveCmd extends AbstractCmd {
-    final byte type = CmdTypeEnum.LEAVE.getCode();
+public class FireCmd extends AbstractCmd {
+    final byte type = CmdTypeEnum.FIRE.getCode();
+    int x;
+    int y;
 }

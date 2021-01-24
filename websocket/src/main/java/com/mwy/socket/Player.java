@@ -1,6 +1,7 @@
 package com.mwy.socket;
 
 import com.mwy.socket.cmd.AbstractCmd;
+import com.mwy.socket.cmd.FireCmd;
 import com.mwy.socket.cmd.JoinCmd;
 import com.mwy.socket.cmd.LeaveCmd;
 import com.mwy.socket.cmd.MoveCmd;
@@ -71,6 +72,12 @@ public abstract class Player {
 
     public void text(TextCmd textCmd){
         Notice(textCmd);
+    }
+
+    public void fire(FireCmd fireCmd){
+        fireCmd.setX(x);
+        fireCmd.setY(y);
+        this.Notice(fireCmd);
     }
 
     private void Notice(AbstractCmd abstractCmd) {
