@@ -68,6 +68,7 @@ public class EndPoint extends Player{
         if(type == 2){
             MoveCmd moveCmd = jsonObject.toJavaObject(MoveCmd.class);
             moveCmd.setId(this.getId());
+            moveCmd.setPic(this.getPic());
             this.move(moveCmd);
         }
         //通知其他人消息

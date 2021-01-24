@@ -15,4 +15,5 @@ public class MoveCmd extends AbstractCmd {
     byte dirY;
     int targetX;
     int targetY;
+    String pic;
 }

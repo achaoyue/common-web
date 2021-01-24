@@ -1,12 +1,6 @@
 package com.mwy.ai;
 
-import com.alibaba.fastjson.JSON;
-import com.mwy.socket.Player;
-import com.mwy.socket.cmd.AbstractCmd;
 import com.mwy.socket.cmd.JoinCmd;
-import com.mwy.socket.cmd.MoveCmd;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,7 +14,7 @@ public class TestAI {
 
     @PostConstruct
     public void init(){
-        //投放20个机器人
+        //投放200个机器人
         for (int i = 0; i < 200; i++) {
             JoinCmd joinCmd = new JoinCmd();
             joinCmd.setId(Double.valueOf(Math.random()*10000000).intValue());
@@ -33,7 +27,6 @@ public class TestAI {
             aiPlayer.join(joinCmd);
             AiSystem.getInstance().add(aiPlayer);
         }
-
         AiSystem.getInstance().start();
 
     }

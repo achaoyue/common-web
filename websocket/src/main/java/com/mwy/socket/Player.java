@@ -23,6 +23,8 @@ public abstract class Player {
     byte dirY;
     String pic;
 
+    long lastSendTime = 0L;
+
     public void join(JoinCmd joinCmd){
         //加入
         MwyMap.save(joinCmd.getTargetX(),joinCmd.getTargetY(),this,true);

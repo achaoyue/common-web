@@ -20,7 +20,7 @@ public class AiSystem implements Runnable {
     }
 
     public void start(){
-        Thread thread = new Thread(this);
+        Thread thread = new Thread(this,"AiSystem");
         thread.setDaemon(true);
         thread.start();
     }

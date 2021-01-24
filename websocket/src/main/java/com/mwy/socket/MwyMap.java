@@ -1,11 +1,14 @@
 package com.mwy.socket;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -75,5 +78,17 @@ public class MwyMap {
 
     private static long buildKey(int x,int y){
         return (format(y) & 0xFFFFFFFFL) | ((format(x) << 32) & 0xFFFFFFFF00000000L);
+    }
+
+    public static List<Player> getByKey(Long key){
+        List<Player> players = map.get(key);
+        if(players == null){
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(players);
+    }
+
+    public static Set<Long> getAllKey() {
+        return new HashSet<>(map.keySet());
     }
 }
