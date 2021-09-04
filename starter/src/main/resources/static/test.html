@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/antd/3.2.0/antd.min.css" />
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+    <script src="https://cdn.staticfile.org/moment.js/2.20.1/moment.min.js"></script>
+    <script src="https://cdn.staticfile.org/antd/3.2.0/antd.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+<div id="hello-example"></div>
+</body>
+</html>
+<script type="text/babel">
+    class DateGet{
+        constructor() {
+            this.params={
+                url:"http://localhost:8081/data/test/stock2",
+                dataLocal:"res"
+            }
+        }
+        getData = ()=>{
+            axios.get(this.params.url).then(res=>{
+                this.data = res.data;
+                window[this.params.dataLocal] = res.data;
+            })
+        }
+    }
+    class A extends React.Component{
+        constructor() {
+            super();
+            window.AA = this;
+        }
+        flush = ()=>{
+            this.setState({})
+        }
+        render = ()=>{
+            return <div>
+                {this.props.children}
+            </div>
+        }
+    }
+</script>
+<script type="application/javascript">
+
+    function Table (){
+        table =  React.createElement(antd.Table, { "dataSource": dataSource,"columns":columns });
+        ReactDOM.render(table, document.getElementById('hello-example'));
+    }
+    function build(ele){
+        var arr = null;
+        if(ele.children){
+            arr = [];
+            ele.children.forEach((e)=>{
+                arr.push(build(e));
+            })
+        }
+        var a = React.createElement(ele.tag, ele.props,arr);
+        console.log(a);
+        return a;
+    }
+
+</script>
+<script type="application/javascript">
+    function Modal1 (){
+        this.params = {
+            url:"",
+            before:function (){},
+            after : function (){},
+            dataSource:[],
+            columns:[{
+                title: '姓名',
+                dataIndex: 'name',
+                key: 'name',
+            },
+                {
+                    title: '年龄',
+                    dataIndex: 'age',
+                    key: 'age',
+                },
+                {
+                    title: '住址',
+                    dataIndex: 'address',
+                    key: 'address',
+                }]
+        }
+        this.data = {
+
+        }
+        this.getDate = ()=>{
+            this.params.before(this);
+            axios.get(this.params.url).then(res=>{
+                this.data = res;
+            }).then(()=>{this.params.after(this)})
+        }
+        this.buildElement = ()=>{
+            var ele ={
+                tag:"div",
+                props:{key:13 },
+                children:[
+                    {
+                        tag:antd.Row,
+                        props: {},
+                        children:[{
+                            tag:antd.Input,
+                            props:{}
+                        }]
+                    },
+                    {
+                        tag:antd.Table,
+                        props:{ "dataSource": this.params.dataSource,"columns":this.params.columns ,key:111},
+                    }
+                ]
+            }
+            return build(ele);
+        }
+    }
+</script>

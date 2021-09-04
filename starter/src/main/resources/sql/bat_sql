@@ -1,0 +1,34 @@
+create table statement
+(
+    id            bigint auto_increment
+        primary key,
+    uniq_key      varchar(100) null,
+    statement_id  varchar(100) null,
+    type          varchar(100) null,
+    default_param varchar(100) null
+);
+
+create table statement_xml
+(
+    id          bigint auto_increment
+        primary key,
+    xml_content text null
+);
+
+create table stock
+(
+    id         bigint auto_increment
+        primary key,
+    stock_name varchar(100) null,
+    stock_code varchar(100) null
+);
+
+create table stock_tag
+(
+    id         bigint auto_increment
+        primary key,
+    stock_code varchar(100) null,
+    stock_tag  varchar(100) null,
+    remark     text         null
+);
+
