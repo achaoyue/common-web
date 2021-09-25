@@ -2,17 +2,22 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/antd/3.2.0/antd.min.css" />
-    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
-    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/antd/4.16.11/antd.min.css" />
+    <script src="https://cdn.staticfile.org/react/17.0.2/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/17.0.2/umd/react-dom.development.js"></script>
     <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
-    <script src="https://cdn.staticfile.org/moment.js/2.20.1/moment.min.js"></script>
-    <script src="https://cdn.staticfile.org/antd/3.2.0/antd.min.js"></script>
+    <script src="https://cdn.staticfile.org/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.staticfile.org/antd/4.16.11/antd.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
+    <style>
+        .ant-image-preview-img-wrapper{
+            background-color: #80ff82;
+        }
+    </style>
 </head>
 <body>
 <div id="hello-example"></div>
+<div id="ele_panel"></div>
 </body>
 </html>
 <script type="text/babel">
@@ -23,34 +28,92 @@
                 dataLocal:"res"
             }
         }
-        getData = ()=>{
-            axios.get(this.params.url).then(res=>{
+        getData = () => {
+            return axios.get(this.params.url).then(res=>{
+                this.data = res.data;
+                window[this.params.dataLocal] = res.data;
+            })
+        }
+
+        postData = () => {
+            return axios.post(this.params.url,this.params.data).then(res=>{
                 this.data = res.data;
                 window[this.params.dataLocal] = res.data;
             })
         }
     }
-    class A extends React.Component{
+    let dataGet = new DateGet();
+    dataGet.params={
+        url:"http://localhost:8081/data/test/stock2",
+        dataLocal:"res"
+    }
+    const MIN_TYPE = 1;
+    const DAILY_TYPE = 2;
+    const WEEKLY_TYPE = 3;
+    const MONTHLY_TYPE = 4;
+    dataGet.imageType = DAILY_TYPE;
+
+    class ImageStream extends React.Component{
         constructor() {
             super();
-            window.AA = this;
+            this.dataGet = dataGet;
+
+            this.dataGet.getData()
+                .then(()=>{this.flush()})
         }
         flush = ()=>{
+            console.log("flush:",this.dataGet.imageType)
             this.setState({})
         }
         render = ()=>{
+            if(!this.dataGet.data){
+                return <div>
+                    waiting
+                </div>
+            }
+            let select = <div>
+                <antd.Radio.Group onChange={(e)=>{dataGet.imageType = e.target.value;this.flush()}} value={dataGet.imageType}>
+                    <antd.Radio value={MIN_TYPE}>时线</antd.Radio>
+                    <antd.Radio value={DAILY_TYPE}>日线</antd.Radio>
+                    <antd.Radio value={WEEKLY_TYPE}>周线</antd.Radio>
+                    <antd.Radio value={MONTHLY_TYPE}>月线</antd.Radio>
+                </antd.Radio.Group>
+            </div>
+            let element = this.dataGet.data.map(e=>{
+                let pic = "http://image.sinajs.cn/newchart/daily/n/"+e.stock_code+".gif";
+                if (this.dataGet.imageType == MIN_TYPE){
+                    pic = "http://image.sinajs.cn/newchart/min/n/"+e.stock_code+".gif";
+                }
+                if (this.dataGet.imageType == DAILY_TYPE){
+                    pic = "http://image.sinajs.cn/newchart/daily/n/"+e.stock_code+".gif";
+                }
+                if (this.dataGet.imageType == WEEKLY_TYPE){
+                    pic = "http://image.sinajs.cn/newchart/weekly/n/"+e.stock_code+".gif";
+                }
+                if (this.dataGet.imageType == MONTHLY_TYPE){
+                    pic = " http://image.sinajs.cn/newchart/monthly/n/"+e.stock_code+".gif";
+                }
+                let key = ""+this.dataGet.imageType+"_"+e.stock_code;
+                return <div key={key} style={{width:300,display:'inline-block',marginBottom:20,borderBottom:'1px solid'}}>
+                    <antd.Image width="100%"
+                                src={pic}
+                                previewType={{visible:true,maskClassName:'imgMask'}}
+                    ></antd.Image>
+                    <div style={{textAlign:'center',display:'inline-block'}}>{e.stock_name}</div>
+                    <a target="_blank" href={"http://quote.eastmoney.com/concept/"+e.stock_code+".html#"} style={{textAlign:'center',display:'inline-block',marginLeft:20}}>东方财富</a>
+                    <a target="_blank" href={"https://xueqiu.com/S/"+e.stock_code+""} style={{textAlign:'center',display:'inline-block',marginLeft:20}}>雪球</a>
+                    <a target="_blank" href={"http://finance.sina.com.cn/realstock/company/"+e.stock_code+"/nc.shtml"} style={{textAlign:'center',display:'inline-block',marginLeft:20}}>新浪</a>
+                </div>
+            })
             return <div>
-                {this.props.children}
+                {select}
+                {element}
             </div>
         }
     }
+    ReactDOM.render(<ImageStream/>, document.getElementById('ele_panel'));
 </script>
 <script type="application/javascript">
-
-    function Table (){
-        table =  React.createElement(antd.Table, { "dataSource": dataSource,"columns":columns });
-        ReactDOM.render(table, document.getElementById('hello-example'));
-    }
     function build(ele){
         var arr = null;
         if(ele.children){
@@ -66,57 +129,5 @@
 
 </script>
 <script type="application/javascript">
-    function Modal1 (){
-        this.params = {
-            url:"",
-            before:function (){},
-            after : function (){},
-            dataSource:[],
-            columns:[{
-                title: '姓名',
-                dataIndex: 'name',
-                key: 'name',
-            },
-                {
-                    title: '年龄',
-                    dataIndex: 'age',
-                    key: 'age',
-                },
-                {
-                    title: '住址',
-                    dataIndex: 'address',
-                    key: 'address',
-                }]
-        }
-        this.data = {
 
-        }
-        this.getDate = ()=>{
-            this.params.before(this);
-            axios.get(this.params.url).then(res=>{
-                this.data = res;
-            }).then(()=>{this.params.after(this)})
-        }
-        this.buildElement = ()=>{
-            var ele ={
-                tag:"div",
-                props:{key:13 },
-                children:[
-                    {
-                        tag:antd.Row,
-                        props: {},
-                        children:[{
-                            tag:antd.Input,
-                            props:{}
-                        }]
-                    },
-                    {
-                        tag:antd.Table,
-                        props:{ "dataSource": this.params.dataSource,"columns":this.params.columns ,key:111},
-                    }
-                ]
-            }
-            return build(ele);
-        }
-    }
 </script>
