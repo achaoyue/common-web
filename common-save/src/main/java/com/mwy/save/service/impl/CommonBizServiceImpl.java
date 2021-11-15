@@ -83,6 +83,13 @@ public class CommonBizServiceImpl implements CommonBizService {
                 }
             }
         });
+        //必填校验
+        paramConfigModals.stream().forEach(e->{
+            if(Boolean.TRUE.equals(e.getRequired())
+                    && param.get(e.getParamName())==null){
+                throw new RuntimeException("参数必填:"+e.getParamPath());
+            }
+        });
 
         return execParam(statementDO, param);
     }
