@@ -1,7 +1,7 @@
 package com.mwy.save.reponstory.mapper;
 
 import com.mwy.save.reponstory.dao.modal.StatementDO;
-import com.mwy.save.util.MyBaseMapper;
+import com.mwy.base.util.db.MyBaseMapper;
 import org.springframework.stereotype.Repository;
 
 /**

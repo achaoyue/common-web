@@ -1,4 +1,4 @@
-package com.mwy.save.util;
+package com.mwy.base.util.db;
 
 /**
  * @author mouwenyao

@@ -1,6 +1,6 @@
 package com.mwy.save.reponstory.dao.enums;
 
-import com.mwy.save.util.CodeEnum;
+import com.mwy.base.util.db.CodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
