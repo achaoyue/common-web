@@ -1,7 +1,7 @@
 package com.mwy;
 
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
-import com.mwy.stock.reponstory.remote.modal.EasyMoneyStockDTO;
+import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 
 import java.util.List;
 

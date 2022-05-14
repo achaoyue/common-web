@@ -33,8 +33,6 @@
               `plate` varchar(255) DEFAULT NULL COMMENT '板块',
               `belong_plate` varchar(2048) DEFAULT NULL COMMENT '所属板块',
               `listing_date` varchar(255) DEFAULT NULL COMMENT '上市时间',
-              `score` int(11) DEFAULT NULL COMMENT '得分',
-              `score_desc` text COMMENT '得分描述',
               `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
               PRIMARY KEY (`id`),
               UNIQUE KEY `uk_stock_num` (`stock_num`)

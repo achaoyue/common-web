@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.context.ApplicationContext;
+import tk.mybatis.mapper.entity.Example;
 
 public class BaseDao<T,M extends MyBaseMapper>  {
 
@@ -69,23 +70,23 @@ public class BaseDao<T,M extends MyBaseMapper>  {
         return myBaseMapper.selectByExample(o);
     }
 
-    public T selectOneByExample(Object o) {
+    public T selectOneByExample(Example o) {
         return myBaseMapper.selectOneByExample(o);
     }
 
-    public int selectCountByExample(Object o) {
+    public int selectCountByExample(Example o) {
         return myBaseMapper.selectCountByExample(o);
     }
 
-    public int deleteByExample(Object o) {
+    public int deleteByExample(Example o) {
         return myBaseMapper.deleteByExample(o);
     }
 
-    public int updateByExample(T t, Object o) {
+    public int updateByExample(T t, Example o) {
         return myBaseMapper.updateByExample(t, o);
     }
 
-    public int updateByExampleSelective(T t, Object o) {
+    public int updateByExampleSelective(T t, Example o) {
         return myBaseMapper.updateByExampleSelective(t, o);
     }
 

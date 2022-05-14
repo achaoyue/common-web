@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mwy.base.util.HttpsUtils;
-import com.mwy.stock.reponstory.remote.modal.EasyMoneyStockDTO;
-import com.mwy.stock.reponstory.remote.modal.EasyMoneyStockDayInfoDTO;
+import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
+import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -55,7 +55,7 @@ public class EasyMoneyRepository {
             String kline = (String) klines.get(i);
             String[] item = kline.split(",");
             EasyMoneyStockDayInfoDTO stockDayInfo = new EasyMoneyStockDayInfoDTO();
-            stockDayInfo.setStockCode(stockNum);
+            stockDayInfo.setStockNum(stockNum);
             stockDayInfo.setDate(item[0]);
             stockDayInfo.setOpen(objectToBigDecimal(item[1]));
             stockDayInfo.setClose(objectToBigDecimal(item[2]));
@@ -63,8 +63,12 @@ public class EasyMoneyRepository {
             stockDayInfo.setLow(objectToBigDecimal(item[4]));
             stockDayInfo.setVolume(objectToBigDecimal(item[5]));
             stockDayInfo.setAmount(objectToBigDecimal(item[6]));
+            stockDayInfo.setAmplitude(objectToBigDecimal(item[7]));
+            stockDayInfo.setUpDownRange(objectToBigDecimal(item[8]));
+            stockDayInfo.setUpDownPrices(objectToBigDecimal(item[9]));
+            stockDayInfo.setTurnOverrate(objectToBigDecimal(item[10]));
             if (objectToBigDecimal(item[9]) == null) {
-                stockDayInfo.setPreClose(0);
+                stockDayInfo.setPreClose(Double.valueOf(0));
             } else {
                 if (objectToBigDecimal(item[2]) == null) {
                     log.info("---------------null-------------" + stockNum);

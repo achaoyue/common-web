@@ -1,4 +1,4 @@
-package com.mwy.stock.reponstory.remote.modal;
+package com.mwy.stock.modal.dto.easymoney;
 
 import lombok.Data;
 

@@ -28,4 +28,10 @@ public class StockController {
         stockService.crowStock();
         return Result.ofSuccess(true);
     }
+
+    @GetMapping("/crowStockDayInfo")
+    public Result crowStockDayInfo(@RequestParam("stockNum")String stockNum){
+        stockService.crowStockDayInfo();
+        return Result.ofSuccess(true);
+    }
 }

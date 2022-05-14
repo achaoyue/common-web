@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mwy.stock.reponstory.mapper.StockDayInfoMapper">
+    <insert id="upsert">
+        replace INTO stock_day_info (
+                date,
+                stock_num,
+                open,
+                high,
+                low,
+                close,
+                pre_close,
+                volume,
+                amount,
+                turn_overrate,
+                amplitude,
+                up_down_prices,
+                up_down_range,
+                ma5,
+                ma10,
+                ma20,
+                ma30,
+                ma60,
+                ma120,
+                ma200,
+                ma250,
+                volume120,
+                k,
+                d,
+                j,
+                dif,
+                dea,
+                macd,
+                rsi6,
+                rsi12,
+                rsi24,
+                wr6,
+                wr10,
+                cci
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.date},
+            #{item.stockNum},
+            #{item.open},
+            #{item.high},
+            #{item.low},
+            #{item.close},
+            #{item.preClose},
+            #{item.volume},
+            #{item.amount},
+            #{item.turnOverrate},
+            #{item.amplitude},
+            #{item.upDownPrices},
+            #{item.upDownRange},
+            #{item.ma5},
+            #{item.ma10},
+            #{item.ma20},
+            #{item.ma30},
+            #{item.ma60},
+            #{item.ma120},
+            #{item.ma200},
+            #{item.ma250},
+            #{item.volume120},
+            #{item.k},
+            #{item.d},
+            #{item.j},
+            #{item.dif},
+            #{item.dea},
+            #{item.macd},
+            #{item.rsi6},
+            #{item.rsi12},
+            #{item.rsi24},
+            #{item.wr6},
+            #{item.wr10},
+            #{item.cci}
+            )
+        </foreach>
+    </insert>
+
+    <update id="createTable">
+        CREATE TABLE IF NOT EXISTS stock_day_info (
+        `id` bigint(20) NOT NULL AUTO_INCREMENT,
+        `date` date DEFAULT NULL COMMENT '日期',
+        `stock_num` varchar(50) DEFAULT NULL COMMENT '股票编码',
+        `open` double(10,3) DEFAULT NULL COMMENT '开盘价',
+        `high` double(10,3) DEFAULT NULL COMMENT '最高价',
+        `low` double(10,3) DEFAULT NULL COMMENT '最低价',
+        `close` double(10,3) DEFAULT NULL COMMENT '收盘价',
+        `pre_close` double(10,3) DEFAULT NULL COMMENT '昨收',
+        `volume` double(15,0) DEFAULT NULL COMMENT '成交量',
+        `amount` double(15,0) DEFAULT NULL COMMENT '成交额',
+        `turn_overrate` double DEFAULT NULL COMMENT '换手率',
+        `amplitude` double DEFAULT NULL COMMENT '振幅，一天最大涨幅-最小涨幅',
+        `up_down_prices` double DEFAULT NULL COMMENT '涨跌额度',
+        `up_down_range` double DEFAULT NULL COMMENT '涨幅',
+        `ma5` double(15,5) DEFAULT NULL COMMENT '5日均价',
+        `ma10` double(15,5) DEFAULT NULL COMMENT '10日均价',
+        `ma20` double(15,5) DEFAULT NULL COMMENT '20日均价',
+        `ma30` double(15,5) DEFAULT NULL COMMENT '30日均价',
+        `ma60` double(15,5) DEFAULT NULL COMMENT '60日均价',
+        `ma120` double(15,5) DEFAULT NULL COMMENT '120日均价',
+        `ma200` double(15,5) DEFAULT NULL COMMENT '200日均价',
+        `ma250` double(15,5) DEFAULT NULL COMMENT '250日均价',
+        `volume120` double(15,0) DEFAULT NULL COMMENT '120日成交量',
+        `k` double(15,5) DEFAULT NULL COMMENT 'k',
+        `d` double(15,5) DEFAULT NULL COMMENT 'd',
+        `j` double(15,5) DEFAULT NULL COMMENT 'j',
+        `dif` double(15,5) DEFAULT NULL COMMENT 'dif',
+        `dea` double(15,5) DEFAULT NULL COMMENT 'dea',
+        `macd` double(15,5) DEFAULT NULL COMMENT 'macd',
+        `rsi6` double(15,5) DEFAULT NULL COMMENT 'rsi6',
+        `rsi12` double(15,5) DEFAULT NULL COMMENT 'rsi12',
+        `rsi24` double(15,5) DEFAULT NULL COMMENT 'rsi24',
+        `wr6` double(15,5) DEFAULT NULL COMMENT 'wr6',
+        `wr10` double(15,5) DEFAULT NULL COMMENT 'wr10',
+        `cci` double(15,5) DEFAULT NULL COMMENT 'cci',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_stock_date` (`stock_num`,`date`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    </update>
+    <select id="getLatest" resultType="com.mwy.stock.reponstory.dao.modal.StockDayInfoDO">
+        select * from stock_day_info where stock_num = #{stockNum}
+        order by date desc, id desc
+        limit 1
+    </select>
+
+</mapper>

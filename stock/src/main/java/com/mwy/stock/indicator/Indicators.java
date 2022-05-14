@@ -1,4 +1,4 @@
-package com.mwy.stock.v1;
+package com.mwy.stock.indicator;
 
 import com.tictactec.ta.lib.Core;
 import com.tictactec.ta.lib.MAType;
@@ -356,10 +356,10 @@ public class Indicators {
         // double[] inClose, int optInTimePeriod, out int outBegIdx, out int
         // outNBElement, double[] outReal);
 
-        for (int i = 0; i < inTimePeriod - 1; i++) {
+        for (int i = 0; i < inTimePeriod - 1 && i< output.length; i++) {
             output[i] = 0;
         }
-        for (int i = inTimePeriod - 1; 0 < i && i < (lowPrices.length); i++) {
+        for (int i = inTimePeriod - 1; 0 < i && i < (lowPrices.length) && i< output.length && i - inTimePeriod + 1>=0; i++) {
             output[i] = tempOutPut[i - inTimePeriod + 1];
         }
 
