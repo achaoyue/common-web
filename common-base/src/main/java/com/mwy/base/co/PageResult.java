@@ -14,7 +14,7 @@ public class PageResult<T> {
     private List<T> data;
     private int pageNum;
     private int pageSize;
-    private int total;
+    private long total;
 
     public static<T> PageResult<T> ofSuccess(List<T> data){
         PageResult<T> result = new PageResult<>();
@@ -22,7 +22,7 @@ public class PageResult<T> {
         result.setData(data);
         return result;
     }
-    public static<T> PageResult<T> ofSuccess(List<T> data,int pageNum,int pageSize,int total){
+    public static<T> PageResult<T> ofSuccess(List<T> data,int pageNum,int pageSize,long total){
         PageResult<T> result = new PageResult<>();
         result.setCode(ResultCode.SUCCESS);
         result.setData(data);
@@ -30,5 +30,9 @@ public class PageResult<T> {
         result.setPageSize(pageSize);
         result.setTotal(total);
         return result;
+    }
+
+    public boolean isSuccess(){
+        return code == ResultCode.SUCCESS;
     }
 }

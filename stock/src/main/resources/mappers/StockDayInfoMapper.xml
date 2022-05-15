@@ -5,7 +5,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.mwy.stock.reponstory.mapper.StockDayInfoMapper">
-    <insert id="upsert">
+    <insert id="upsertxx">
         replace INTO stock_day_info (
                 date,
                 stock_num,
@@ -120,6 +120,7 @@
         `wr10` double(15,5) DEFAULT NULL COMMENT 'wr10',
         `cci` double(15,5) DEFAULT NULL COMMENT 'cci',
         PRIMARY KEY (`id`),
+        KEY `date` (`date`),
         UNIQUE KEY `uk_stock_date` (`stock_num`,`date`)
         ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
     </update>

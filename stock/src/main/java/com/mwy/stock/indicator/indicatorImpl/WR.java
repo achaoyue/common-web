@@ -1,4 +1,4 @@
-package com.mwy.stock.indicator.impl;
+package com.mwy.stock.indicator.indicatorImpl;
 
 import com.mwy.stock.indicator.Indicator;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
@@ -64,10 +64,20 @@ public class WR implements Indicator {
                 queue10.poll();
             }
             double currentClosePrice = stockdayinfo.getClose();
-            double wr10 = 100 * (higherPrice10 - currentClosePrice) / (higherPrice10 - lowerPrice10);
-            double wr6 = 100 * (higherPrice6 - currentClosePrice) / (higherPrice6 - lowerPrice6);
-            stockdayinfo.setWr6(wr6);
-            stockdayinfo.setWr10(wr10);
+            if ((higherPrice10 - lowerPrice10) == 0) {
+                stockdayinfo.setWr10(0D);
+            } else {
+                double wr10 = 100 * (higherPrice10 - currentClosePrice) / (higherPrice10 - lowerPrice10);
+                stockdayinfo.setWr10(wr10);
+            }
+            if ((higherPrice6 - lowerPrice6) == 0) {
+                stockdayinfo.setWr6(0D);
+            } else {
+                double wr6 = 100 * (higherPrice6 - currentClosePrice) / (higherPrice6 - lowerPrice6);
+                stockdayinfo.setWr6(wr6);
+            }
+
+
             newstockDayinfoList.add(stockdayinfo);
         }
         return newstockDayinfoList;

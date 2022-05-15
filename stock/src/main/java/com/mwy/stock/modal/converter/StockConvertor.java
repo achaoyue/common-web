@@ -1,11 +1,15 @@
 package com.mwy.stock.modal.converter;
 
+import com.mwy.stock.modal.dto.StockScoreDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
+import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +51,7 @@ public class StockConvertor {
             return Collections.emptyList();
         }
         return moneyStockDayInfoDTOS.stream()
-                .map(e->toDayInfoDO(e))
+                .map(e -> toDayInfoDO(e))
                 .collect(Collectors.toList());
     }
 
@@ -90,10 +94,25 @@ public class StockConvertor {
         return stockDayInfoDO;
     }
 
-    public static Double scale(Double d){
+    public static Double scale(Double d) {
         if (d == null){
-            return d;
+            return null;
         }
-        return ((int)(d * 100000)) / 100000.0;
+        if (d.isNaN()) {
+            return 0D;
+        }
+        return d;
+    }
+
+    public static StockScoreDO toScoreDO(StockScoreDTO scoreDTO) {
+        StockScoreDO stockScoreDO = new StockScoreDO();
+        stockScoreDO.setStockNum(scoreDTO.getStockNum());
+        stockScoreDO.setDate(scoreDTO.getDate());
+        stockScoreDO.setStrategyId(scoreDTO.getStrategyId());
+        stockScoreDO.setStrategyName(scoreDTO.getStrategyName());
+        stockScoreDO.setScore(scoreDTO.getScore());
+        stockScoreDO.setScoreDesc(scoreDTO.getScoreDesc());
+        stockScoreDO.setUpdateDate(scoreDTO.getUpdateDate());
+        return stockScoreDO;
     }
 }

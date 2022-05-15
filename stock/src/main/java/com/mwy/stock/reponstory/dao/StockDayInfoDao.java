@@ -1,5 +1,7 @@
 package com.mwy.stock.reponstory.dao;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.mwy.base.util.db.BaseDao;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
@@ -9,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.weekend.WeekendSqls;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -19,11 +23,12 @@ public class StockDayInfoDao extends BaseDao<StockDayInfoDO, StockDayInfoMapper>
     @Resource
     private StockDayInfoMapper stockDayInfoMapper;
 
-    public int upsert(List<StockDayInfoDO> list) {
+    @Override
+    public int upsertList(List<StockDayInfoDO> list) {
         if (CollectionUtils.isEmpty(list)) {
             return 0;
         }
-        return stockDayInfoMapper.upsert(list);
+        return stockDayInfoMapper.upsertList(list);
     }
 
     @Override
@@ -34,5 +39,17 @@ public class StockDayInfoDao extends BaseDao<StockDayInfoDO, StockDayInfoMapper>
 
     public StockDayInfoDO getLatest(String stockNum) {
         return stockDayInfoMapper.getLatest(stockNum);
+    }
+
+    public List<StockDayInfoDO> selectTopN(String stockNum, String date, int size) {
+        Page<Object> page = PageHelper.startPage(0, size, false);
+        WeekendSqls<StockDayInfoDO> sqls = WeekendSqls.custom();
+        sqls.andEqualTo(StockDayInfoDO::getStockNum, stockNum);
+        sqls.andLessThanOrEqualTo(StockDayInfoDO::getDate, date);
+        Example example = Example.builder(StockDayInfoDO.class)
+                .where(sqls)
+                .orderByDesc("date")
+                .build();
+        return stockDayInfoMapper.selectByExample(example);
     }
 }

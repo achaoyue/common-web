@@ -138,16 +138,6 @@ public class StockDO {
     private String listingDate;
 
     /**
-     * 得分
-     */
-    private int score;
-
-    /**
-     * 得分描述
-     */
-    private String scoreDesc;
-
-    /**
      * 更新时间
      */
     private Date updateDate;

@@ -1,4 +1,4 @@
-package com.mwy.stock.indicator.impl;
+package com.mwy.stock.indicator.indicatorImpl;
 
 
 import com.mwy.stock.indicator.Indicator;

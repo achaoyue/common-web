@@ -15,4 +15,8 @@ public class Result<T> {
         return result;
     }
 
+    public boolean isSuccess(){
+        return code == ResultCode.SUCCESS;
+    }
+
 }

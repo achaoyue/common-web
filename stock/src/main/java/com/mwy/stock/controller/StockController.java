@@ -3,6 +3,7 @@ package com.mwy.stock.controller;
 import com.mwy.base.co.Result;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.service.StockService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +32,11 @@ public class StockController {
 
     @GetMapping("/crowStockDayInfo")
     public Result crowStockDayInfo(@RequestParam("stockNum")String stockNum){
-        stockService.crowStockDayInfo();
+        if (StringUtils.isEmpty(stockNum)){
+            stockService.crowStockDayInfo();
+        }else {
+            stockService.crowStockDayInfo(stockNum);
+        }
         return Result.ofSuccess(true);
     }
 }

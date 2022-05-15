@@ -1,11 +1,13 @@
 package com.mwy.base.util.db;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.List;
-import javax.annotation.Resource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.context.ApplicationContext;
 import tk.mybatis.mapper.entity.Example;
+
+import javax.annotation.Resource;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 public class BaseDao<T,M extends MyBaseMapper>  {
 
@@ -46,6 +48,20 @@ public class BaseDao<T,M extends MyBaseMapper>  {
         return myBaseMapper.insert(t);
     }
 
+    public int upsertList(List<T> list){
+        if (CollectionUtils.isEmpty(list)){
+            return 0;
+        }
+        return myBaseMapper.upsertList(list);
+    }
+
+    public int upsert(T o){
+        if (o == null) {
+            return 0;
+        }
+        return myBaseMapper.upsert(o);
+    }
+
     public int insertSelective(T t) {
         return myBaseMapper.insertSelective(t);
     }
@@ -66,7 +82,7 @@ public class BaseDao<T,M extends MyBaseMapper>  {
         return myBaseMapper.deleteByPrimaryKey(o);
     }
 
-    public List<T> selectByExample(Object o) {
+    public List<T> selectByExample(Example o) {
         return myBaseMapper.selectByExample(o);
     }
 
@@ -99,6 +115,9 @@ public class BaseDao<T,M extends MyBaseMapper>  {
     }
 
     public int insertList(List<? extends T> list) {
+        if (CollectionUtils.isEmpty(list)){
+            return 0;
+        }
         return myBaseMapper.insertList(list);
     }
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mwy.stock.reponstory.mapper.StockScoreMapper">
+
+    <update id="createTable">
+        CREATE TABLE if NOT EXISTS `stock_score_info` (
+              `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+              `stock_num` varchar(225) DEFAULT NULL COMMENT '股票编码',
+              `stock_name` varchar(225) DEFAULT NULL COMMENT '股票名称',
+              `date` varchar(225) DEFAULT NULL COMMENT '日期',
+              `strategy_id` varchar(225) DEFAULT NULL COMMENT '策略id',
+              `strategy_name` varchar(1024) DEFAULT '' COMMENT '策略简称',
+              `score` int(11) DEFAULT NULL COMMENT '得分',
+              `score_desc` text COMMENT '得分描述',
+              `update_date` datetime DEFAULT NULL COMMENT '更新时间',
+              PRIMARY KEY (`id`),
+              UNIQUE KEY `un_num_date_strategy_id` (`stock_num`,`date`,`strategy_id`),
+              KEY `idx_date` (`date`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    </update>
+
+</mapper>

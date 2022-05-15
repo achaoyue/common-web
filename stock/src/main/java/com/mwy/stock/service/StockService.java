@@ -2,7 +2,7 @@ package com.mwy.stock.service;
 
 import com.google.common.collect.Lists;
 import com.mwy.base.util.Lock;
-import com.mwy.stock.indicator.impl.IndicatorProxy;
+import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
 import com.mwy.stock.modal.converter.StockConvertor;
 import com.mwy.stock.modal.dto.ProgressDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
@@ -16,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import tk.mybatis.mapper.entity.Example;
-import tk.mybatis.mapper.weekend.WeekendSqls;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -99,10 +97,7 @@ public class StockService {
 
     public void crowStockDayInfo(String stockNum) {
         STOP = false;
-        WeekendSqls<StockDO> sqls = WeekendSqls.custom();
-        sqls.andEqualTo(StockDO::getStockNum, stockNum);
-        Example example = Example.builder(StockDO.class).where(sqls).build();
-        StockDO stockDO = stockDao.selectOneByExample(example);
+        StockDO stockDO = stockDao.getByStockNum(stockNum);
         crowStockDayInfo(stockDO);
     }
 
@@ -113,6 +108,10 @@ public class StockService {
      */
     public void crowStockDayInfo(StockDO dbStockDO) {
         if (STOP){
+            return;
+        }
+        if (dbStockDO == null){
+            log.error("股票不存在");
             return;
         }
         long start = System.currentTimeMillis();
@@ -134,8 +133,8 @@ public class StockService {
                 .filter(e -> date == null || e.getDate().compareTo(date)>=0)
                 .collect(Collectors.toList());
 
-        Lists.partition(dayInfoDOS,2000).forEach(e->{
-            stockDayInfoDao.upsert(e);
+        Lists.partition(dayInfoDOS,10000).forEach(e->{
+            stockDayInfoDao.upsertList(e);
         });
         log.info("完成每日信息存储{}-{}.耗时:{}", dbStockDO.getStockNum(), dbStockDO.getStockName(), System.currentTimeMillis() - start);
     }

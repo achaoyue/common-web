@@ -13,7 +13,5 @@ public interface StockDayInfoMapper extends MyBaseMapper<StockDayInfoDO> {
 
     int createTable();
 
-    int upsert(List<StockDayInfoDO> list);
-
     StockDayInfoDO getLatest(@Param("stockNum") String stockNum);
 }
