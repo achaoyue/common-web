@@ -52,4 +52,15 @@ public class StockDayInfoDao extends BaseDao<StockDayInfoDO, StockDayInfoMapper>
                 .build();
         return stockDayInfoMapper.selectByExample(example);
     }
+
+    public int bigThan(String date) {
+        WeekendSqls<StockDayInfoDO> sqls = WeekendSqls.custom();
+        sqls.andEqualTo(StockDayInfoDO::getStockNum, "600479");
+        sqls.andGreaterThan(StockDayInfoDO::getDate, date);
+        Example example = Example.builder(StockDayInfoDO.class)
+                .where(sqls)
+                .orderByDesc("date")
+                .build();
+        return selectCountByExample(example);
+    }
 }

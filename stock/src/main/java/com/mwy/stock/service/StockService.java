@@ -138,4 +138,8 @@ public class StockService {
         });
         log.info("完成每日信息存储{}-{}.耗时:{}", dbStockDO.getStockNum(), dbStockDO.getStockName(), System.currentTimeMillis() - start);
     }
+
+    public int bigThan(String date) {
+        return stockDayInfoDao.bigThan(date);
+    }
 }

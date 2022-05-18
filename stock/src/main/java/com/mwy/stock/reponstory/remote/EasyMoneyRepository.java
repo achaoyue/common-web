@@ -142,6 +142,7 @@ public class EasyMoneyRepository {
             stockBean.setIndustry((String) map.get("f100"));
             stockBean.setPlate((String) map.get("f102"));
             stockBean.setBelongPlate((String) map.get("f103"));
+            stockBean.setUpdateDate(new Date());
 
             stockBeanList.add(stockBean);
         }

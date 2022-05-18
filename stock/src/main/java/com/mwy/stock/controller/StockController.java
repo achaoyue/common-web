@@ -39,4 +39,10 @@ public class StockController {
         }
         return Result.ofSuccess(true);
     }
+
+    @GetMapping("/bigThan")
+    public Result bigThan(@RequestParam("date")String date){
+        int day = stockService.bigThan(date);
+        return Result.ofSuccess(day);
+    }
 }
