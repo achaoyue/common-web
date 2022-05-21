@@ -6,4 +6,13 @@ public class CalculatorConsts {
 
     public static final String Amplitude_Calc = "amplitudeCalculator";
     public static final String Amplitude_Calc_DESC = "幅度计算排序";
+
+    public static final String Beautiful_Calc = "beautifulCalculator";
+    public static final String Beautiful_Calc_DESC = "完美k线";
+
+    public static final String ThreeDaysUp_Calc = "threeDaysUpCalculator";
+    public static final String ThreeDaysUp_Calc_DESC = "三日联涨";
+
+    public static final String ThirtyDaysUp_Calc = "thirtyDaysUpCalculator";
+    public static final String ThirtyDaysUp_Calc_DESC = "三日联涨";
 }

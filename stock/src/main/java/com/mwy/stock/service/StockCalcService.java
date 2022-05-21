@@ -50,12 +50,18 @@ public class StockCalcService {
     @Resource
     private Map<String, StockCalculator> stockCalculatorMap;
 
-    public void calc(String date, String strategyName) {
+    public void calc(String date, String strategyId) {
         List<StockDO> stockDOS = stockDao.selectAll();
         STOP = false;
+        //清除历史计算数据
+        StockScoreDO deleteDo = new StockScoreDO();
+        deleteDo.setStrategyId(strategyId);
+        deleteDo.setDate(date);
+        int deleteCount = stockScoreDao.delete(deleteDo);
+        log.info("历史数据清除完毕:{},{},删除条数:{}",date,strategyId,deleteCount);
         for (StockDO stockDO : stockDOS) {
             threadPoolTaskExecutor.submit(() -> {
-                calc(stockDO, date, strategyName);
+                calc(stockDO, date, strategyId);
             });
         }
     }
@@ -77,6 +83,11 @@ public class StockCalcService {
         }
         //计算
         StockScoreDTO scoreDTO = stockCalculatorMap.get(strategyId).calc(stockDO.getStockNum(), date);
+
+        if (scoreDTO == null){
+            log.info("忽略计算:{}",stockDO.getStockNum());
+            return;
+        }
 
         StockScoreDO stockScoreDO = StockConvertor.toScoreDO(scoreDTO);
         stockScoreDO.setStockName(stockDO.getStockName());
