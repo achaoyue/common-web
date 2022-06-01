@@ -15,4 +15,10 @@ public class CalculatorConsts {
 
     public static final String ThirtyDaysUp_Calc = "thirtyDaysUpCalculator";
     public static final String ThirtyDaysUp_Calc_DESC = "三日联涨";
+
+    public static final String Ma_Rise_Up_Calc = "maRiseUpCalculator";
+    public static final String Ma_Rise_Up_Calc_DESC = "ma齐头上涨";
+
+    public static final String Top_Rise_Up_Calc = "topRiseUpCalculator";
+    public static final String Top_Rise_Up_Calc_DESC = "当日涨幅排序";
 }

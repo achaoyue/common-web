@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/stock")
@@ -22,6 +23,12 @@ public class StockController {
     public Result getOne(@RequestParam("id") long id){
         StockDO stockDO = stockService.get(id);
         return Result.ofSuccess(stockDO);
+    }
+
+    @GetMapping("/industryList")
+    public Result industryList(){
+        List<String> industryList = stockService.industryList();
+        return Result.ofSuccess(industryList);
     }
 
     @GetMapping("/crowStock")

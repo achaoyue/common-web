@@ -13,4 +13,9 @@ public class StockScoreQry extends PageBaseQry {
      * 策略
      */
     private String strategyId;
+
+    /**
+     * 行业
+     */
+    private String industry;
 }

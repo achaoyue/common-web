@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.weekend.WeekendSqls;
 
@@ -108,13 +109,27 @@ public class StockCalcService {
         WeekendSqls<StockScoreDO> sqls = WeekendSqls.custom();
         sqls.andEqualTo(StockScoreDO::getDate, qry.getDate());
         sqls.andEqualTo(StockScoreDO::getStrategyId,qry.getStrategyId());
+        if(StringUtils.isNotEmpty(qry.getIndustry())){
+            List<StockDO> industry = stockDao.getByIndustry(qry.getIndustry());
+            if (CollectionUtils.isEmpty(industry)){
+                throw new RuntimeException("未知行业");
+            }
+            List<String> industryList = industry.stream().map(e -> e.getStockNum()).collect(Collectors.toList());
+            sqls.andIn(StockScoreDO::getStockNum,industryList);
+        }
         Example example = Example.builder(StockScoreDO.class)
                 .where(sqls)
                 .orderByDesc("score")
                 .build();
         Page<Object> page = PageHelper.startPage(qry.getPageNum(), qry.getPageSize());
         List<StockScoreDO> stockScoreDOS = stockScoreDao.selectByExample(example);
-        List<StockScoreCO> list = StockScoreConvetor.toCO(stockScoreDOS);
+
+        List<String> stockNums = stockScoreDOS.stream()
+                .map(StockScoreDO::getStockNum)
+                .collect(Collectors.toList());
+        List<StockDO> stockDOS = stockDao.getByStockNums(stockNums);
+
+        List<StockScoreCO> list = StockScoreConvetor.toCO(stockScoreDOS,stockDOS);
         return PageResult.ofSuccess(list,qry.getPageNum(),qry.getPageSize(),page.getTotal());
     }
 }

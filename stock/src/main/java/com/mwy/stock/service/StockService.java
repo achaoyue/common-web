@@ -64,7 +64,7 @@ public class StockService {
                 .peek(e -> e.setId(stockDOMap.get(e.getStockNum()).getId()))
                 .collect(Collectors.toList());
         for (StockDO stockDO : updateStockDos) {
-            stockDao.updateById(stockDO);
+            stockDao.updateByIdSelective(stockDO);
         }
 
         List<StockDO> insertStockDOs = stockDTOList.stream()
@@ -137,9 +137,21 @@ public class StockService {
             stockDayInfoDao.upsertList(e);
         });
         log.info("完成每日信息存储{}-{}.耗时:{}", dbStockDO.getStockNum(), dbStockDO.getStockName(), System.currentTimeMillis() - start);
+
+        Double currClose = dayInfoDOS.get(dayInfoDOS.size() -1).getClose();
+        Double curr3Close = dayInfoDOS.get(dayInfoDOS.size() -3).getClose();
+        Double curr5Close = dayInfoDOS.get(dayInfoDOS.size() -5).getClose();
+        dbStockDO.setUpDownRange3((currClose - curr3Close)/curr3Close);
+        dbStockDO.setUpDownRange5((currClose - curr5Close)/curr5Close);
+        stockDao.updateByIdSelective(dbStockDO);
     }
 
     public int bigThan(String date) {
         return stockDayInfoDao.bigThan(date);
+    }
+
+    public List<String> industryList() {
+        List<String> list = stockDao.selectIndustry();
+        return list;
     }
 }

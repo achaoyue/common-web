@@ -38,5 +38,8 @@
               UNIQUE KEY `uk_stock_num` (`stock_num`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     </update>
+    <select id="selectIndustry" resultType="java.lang.String">
+          select distinct industry from stock;
+    </select>
 
 </mapper>
