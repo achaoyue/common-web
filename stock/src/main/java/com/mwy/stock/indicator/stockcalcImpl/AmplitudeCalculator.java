@@ -27,7 +27,7 @@ public class AmplitudeCalculator implements StockCalculator {
         stockScoreDTO.setDate(date);
         stockScoreDTO.setStrategyId(CalculatorConsts.Amplitude_Calc);
         stockScoreDTO.setStrategyName(CalculatorConsts.Amplitude_Calc_DESC);
-        stockScoreDTO.setScore(Integer.MIN_VALUE);
+        stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());
 
@@ -123,7 +123,7 @@ public class AmplitudeCalculator implements StockCalculator {
                 1.1 //7 goldKdj
         };
 
-        stockScoreDTO.setScore((int)(cciK*right[0]
+        stockScoreDTO.setScore((cciK*right[0]
                 + macdK*right[1]
                 + volumeK*right[2]
                 + kdjK*right[3]

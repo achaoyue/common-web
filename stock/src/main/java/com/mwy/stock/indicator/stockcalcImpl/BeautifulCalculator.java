@@ -34,7 +34,7 @@ public class BeautifulCalculator implements StockCalculator {
         stockScoreDTO.setDate(date);
         stockScoreDTO.setStrategyId(CalculatorConsts.Beautiful_Calc);
         stockScoreDTO.setStrategyName(CalculatorConsts.Beautiful_Calc_DESC);
-        stockScoreDTO.setScore(Integer.MIN_VALUE);
+        stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());
 
@@ -93,7 +93,7 @@ public class BeautifulCalculator implements StockCalculator {
             return null;
         }
 
-        stockScoreDTO.setScore((int) (currentDayInfo.getTurnOverrate()*100));
+        stockScoreDTO.setScore((currentDayInfo.getTurnOverrate()*100));
         stockScoreDTO.setScoreDesc("");
 
         return stockScoreDTO;

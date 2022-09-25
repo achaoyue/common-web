@@ -44,4 +44,8 @@ public class DateUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static Date addDay(Date now, int day){
+        return new Date(now.getTime() + 1000*60*60*24*day);
+    }
 }

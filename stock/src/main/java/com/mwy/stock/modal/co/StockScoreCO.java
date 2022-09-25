@@ -7,7 +7,7 @@ public class StockScoreCO {
     private String stockNum;
     private String stockName;
     private Double upDownRange;
-    private int score;
+    private Double score;
     private String scoreDesc;
 
 

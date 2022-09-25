@@ -33,7 +33,7 @@ public class ThreeDaysUpCalculator implements StockCalculator {
         stockScoreDTO.setDate(date);
         stockScoreDTO.setStrategyId(CalculatorConsts.ThreeDaysUp_Calc);
         stockScoreDTO.setStrategyName(CalculatorConsts.ThreeDaysUp_Calc_DESC);
-        stockScoreDTO.setScore(Integer.MIN_VALUE);
+        stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());
 
@@ -66,7 +66,7 @@ public class ThreeDaysUpCalculator implements StockCalculator {
 
         TrendEnum trend = trendsCalculator.trend(closeArr, 4);
         if (trend == TrendEnum.Index_Rise || trend == TrendEnum.Straight_Rise){
-            stockScoreDTO.setScore((int) (currentDayInfo.getTurnOverrate()*100));
+            stockScoreDTO.setScore((currentDayInfo.getTurnOverrate()*100));
             stockScoreDTO.setScoreDesc("");
         }else{
             return null;

@@ -30,7 +30,7 @@ public class TopRiseCalculator implements StockCalculator {
         stockScoreDTO.setDate(date);
         stockScoreDTO.setStrategyId(CalculatorConsts.Top_Rise_Up_Calc);
         stockScoreDTO.setStrategyName(CalculatorConsts.Top_Rise_Up_Calc_DESC);
-        stockScoreDTO.setScore(Integer.MIN_VALUE);
+        stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());
 
@@ -47,7 +47,7 @@ public class TopRiseCalculator implements StockCalculator {
             log.error("K线无最新数据.{}", stockNum);
             return null;
         }
-        stockScoreDTO.setScore((int) (currentDayInfo.getUpDownRange()*1000));
+        stockScoreDTO.setScore((currentDayInfo.getUpDownRange()*1000));
         stockScoreDTO.setScoreDesc("当日涨幅"+currentDayInfo.getUpDownRange());
 
         return stockScoreDTO;

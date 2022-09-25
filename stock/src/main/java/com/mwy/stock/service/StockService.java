@@ -1,5 +1,7 @@
 package com.mwy.stock.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.mwy.base.util.Lock;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
@@ -11,11 +13,14 @@ import com.mwy.stock.reponstory.dao.StockDao;
 import com.mwy.stock.reponstory.dao.StockDayInfoDao;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
+import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.weekend.WeekendSqls;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -148,6 +153,19 @@ public class StockService {
 
     public int bigThan(String date) {
         return stockDayInfoDao.bigThan(date);
+    }
+
+    public Map<String, List<StockDayInfoDO>> getStockClosePrice(List<String> stockNums, String startTime, String endTime){
+        WeekendSqls<StockDayInfoDO> sqls = WeekendSqls.custom();
+        sqls.andBetween(StockDayInfoDO::getDate,startTime,endTime);
+        sqls.andIn(StockDayInfoDO::getStockNum,stockNums);
+        Example example = Example.builder(StockScoreDO.class)
+                .where(sqls)
+                .build();
+        List<StockDayInfoDO> stockScoreDOS = stockDayInfoDao.selectByExample(example);
+        return stockScoreDOS.stream()
+                .collect(Collectors.groupingBy(e->e.getStockNum(),Collectors.toList()));
+
     }
 
     public List<String> industryList() {

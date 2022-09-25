@@ -12,7 +12,7 @@ public class ThreadPoolConfig {
     @Bean
     public ThreadPoolTaskExecutor bizThreadPool() {
         int cpuNum = Runtime.getRuntime().availableProcessors();
-        return obtainExecutor(cpuNum * 2, cpuNum * 2 + 10, 10000, 60);
+        return obtainExecutor(8, 16, 10000, 60);
     }
 
     private ThreadPoolTaskExecutor obtainExecutor(int coreSize, int maxSize, int capacity, int aliveSeconds) {

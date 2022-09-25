@@ -45,7 +45,7 @@ public class StockScoreDO {
     /**
      * 股票得分
      */
-    private Integer score;
+    private Double score;
 
     /**
      * 得分描述

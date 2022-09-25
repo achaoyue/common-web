@@ -25,6 +25,7 @@ import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.weekend.WeekendSqls;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,6 +76,15 @@ public class StockCalcService {
         }
         STOP = false;
         calc(stockDO, date, strategyId);
+    }
+
+    public List<StockScoreDTO> calcTest(List<String> stockNums, String date, String strategyId) {
+        List<StockScoreDTO> list = new ArrayList<>();
+        for (String stockNum : stockNums) {
+            StockScoreDTO scoreDTO = stockCalculatorMap.get(strategyId).calc(stockNum, date);
+            list.add(scoreDTO);
+        }
+        return list;
     }
 
     public void calc(StockDO stockDO, String date, String strategyId) {

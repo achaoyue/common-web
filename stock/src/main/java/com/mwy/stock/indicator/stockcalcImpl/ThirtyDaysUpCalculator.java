@@ -35,7 +35,7 @@ public class ThirtyDaysUpCalculator implements StockCalculator {
         stockScoreDTO.setDate(date);
         stockScoreDTO.setStrategyId(CalculatorConsts.ThirtyDaysUp_Calc);
         stockScoreDTO.setStrategyName(CalculatorConsts.ThirtyDaysUp_Calc_DESC);
-        stockScoreDTO.setScore(Integer.MIN_VALUE);
+        stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());
 
@@ -69,7 +69,7 @@ public class ThirtyDaysUpCalculator implements StockCalculator {
         if (stockDayInfos.get(0).getClose() > maxClose1
                 && stockDayInfos.get(0).getClose() > maxClose3
                 && stockDayInfos.get(1).getClose() < maxClose2){
-            stockScoreDTO.setScore((int) (stockDayInfos.get(0).getTurnOverrate()*100));
+            stockScoreDTO.setScore((stockDayInfos.get(0).getTurnOverrate()*100));
             stockScoreDTO.setScoreDesc("");
         }else {
             log.info("diff:{},maxClose:{},minClose:{}",maxClose1,maxClose2);

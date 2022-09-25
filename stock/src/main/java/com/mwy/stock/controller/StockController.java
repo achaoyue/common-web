@@ -2,7 +2,9 @@ package com.mwy.stock.controller;
 
 import com.mwy.base.co.Result;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
+import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.service.StockService;
+import com.mwy.stock.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stock")
@@ -51,5 +55,20 @@ public class StockController {
     public Result bigThan(@RequestParam("date")String date){
         int day = stockService.bigThan(date);
         return Result.ofSuccess(day);
+    }
+
+    @GetMapping("/getDayInfoList")
+    public Result getDayInfoList(@RequestParam("stockNums") List<String> stockNums, String startTime,String endTime){
+        if (endTime == null){
+            endTime = DateUtils.date2String(new Date(),"yyyy-MM-dd");
+        }
+        if (startTime == null){
+            Date date = DateUtils.string2Date(endTime, "yyyy-MM-dd");
+            date = DateUtils.addDay(date,-10);
+            startTime = DateUtils.date2String(date,"yyyy-MM-dd");
+        }
+        Map<String, List<StockDayInfoDO>> stockClosePrice = stockService.getStockClosePrice(stockNums, startTime, endTime);
+        return Result.ofSuccess(stockClosePrice);
+
     }
 }

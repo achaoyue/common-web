@@ -30,7 +30,7 @@ public class MaRiseUpCalculator implements StockCalculator {
         stockScoreDTO.setDate(date);
         stockScoreDTO.setStrategyId(CalculatorConsts.Ma_Rise_Up_Calc);
         stockScoreDTO.setStrategyName(CalculatorConsts.Ma_Rise_Up_Calc_DESC);
-        stockScoreDTO.setScore(Integer.MIN_VALUE);
+        stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());
 
@@ -57,7 +57,7 @@ public class MaRiseUpCalculator implements StockCalculator {
 
 
         if (allUp){
-            stockScoreDTO.setScore((int) (stockDayInfos.get(0).getTurnOverrate()*100));
+            stockScoreDTO.setScore((stockDayInfos.get(0).getTurnOverrate()*100));
             stockScoreDTO.setScoreDesc("");
         }else {
 
