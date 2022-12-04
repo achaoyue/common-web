@@ -3,11 +3,13 @@ package com.mwy.stock.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.mwy.base.co.PageResult;
+import com.mwy.stock.indicator.AbsStockCalculator;
 import com.mwy.stock.indicator.StockCalculator;
 import com.mwy.stock.modal.co.StockScoreCO;
 import com.mwy.stock.modal.converter.StockConvertor;
 import com.mwy.stock.modal.converter.StockScoreConvetor;
 import com.mwy.stock.modal.dto.StockScoreDTO;
+import com.mwy.stock.modal.enums.CalculatorEnum;
 import com.mwy.stock.modal.qry.StockScoreQry;
 import com.mwy.stock.reponstory.dao.StockDao;
 import com.mwy.stock.reponstory.dao.StockDayInfoDao;
@@ -26,6 +28,7 @@ import tk.mybatis.mapper.weekend.WeekendSqls;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,8 +52,20 @@ public class StockCalcService {
     private StockScoreDao stockScoreDao;
     @Resource(name = "bizThreadPool")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    private Map<String, StockCalculator> stockCalculatorMap = new HashMap<>();
+
     @Resource
-    private Map<String, StockCalculator> stockCalculatorMap;
+    public void initStockCalculatorMap(Map<String, StockCalculator> stockCalculatorMap){
+        this.stockCalculatorMap.putAll(stockCalculatorMap);
+        for (StockCalculator value : stockCalculatorMap.values()) {
+            if (value instanceof AbsStockCalculator){
+                CalculatorEnum type = ((AbsStockCalculator) value).type();
+                this.stockCalculatorMap.put(type.getCode(),value);
+            }
+        }
+
+    }
 
     public void calc(String date, String strategyId) {
         List<StockDO> stockDOS = stockDao.selectAll();

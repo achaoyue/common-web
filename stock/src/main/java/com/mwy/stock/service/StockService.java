@@ -1,7 +1,5 @@
 package com.mwy.stock.service;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.mwy.base.util.Lock;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
@@ -11,6 +9,7 @@ import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
 import com.mwy.stock.reponstory.dao.StockDao;
 import com.mwy.stock.reponstory.dao.StockDayInfoDao;
+import com.mwy.stock.reponstory.dao.StockTimeInfoDao;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
@@ -43,6 +42,8 @@ public class StockService {
     private StockDayInfoDao stockDayInfoDao;
     @Resource
     private EasyMoneyRepository easyMoneyRepository;
+    @Resource
+    private StockTimeInfoDao stockTimeInfoDao;
     @Resource(name = "bizThreadPool")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
@@ -68,16 +69,26 @@ public class StockService {
                 .filter(e -> stockDOMap.containsKey(e.getStockNum()))
                 .peek(e -> e.setId(stockDOMap.get(e.getStockNum()).getId()))
                 .collect(Collectors.toList());
+        double i = 0;
         for (StockDO stockDO : updateStockDos) {
             stockDao.updateByIdSelective(stockDO);
+            stockTimeInfoDao.crowTimeInfo(stockDO.getStockNum());
+            i++;
+            log.info("process:{}",i/stockDTOList.size());
         }
 
         List<StockDO> insertStockDOs = stockDTOList.stream()
                 .map(e -> StockConvertor.toDO(e))
                 .filter(e -> !stockDOMap.containsKey(e.getStockNum()))
+                .filter(e -> !"-".equals(e.getIndustry()))
                 .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(insertStockDOs)) {
             stockDao.insertList(insertStockDOs);
+            for (StockDO insertStockDO : insertStockDOs) {
+                stockTimeInfoDao.crowTimeInfo(insertStockDO.getStockNum());
+                i++;
+                log.info("process:{}",i/stockDTOList.size());
+            }
         }
     }
 

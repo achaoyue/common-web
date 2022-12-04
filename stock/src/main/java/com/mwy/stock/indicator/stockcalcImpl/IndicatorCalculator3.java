@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.List;
 
 @Slf4j
-@Component(CalculatorConsts.Indicator_Calc2)
-public class IndicatorCalculator2 implements StockCalculator {
+@Component(CalculatorConsts.Indicator_Calc3)
+public class IndicatorCalculator3 implements StockCalculator {
 
     @Resource
     private StockDayInfoDao stockDayInfoDao;
@@ -30,8 +30,8 @@ public class IndicatorCalculator2 implements StockCalculator {
         StockScoreDTO stockScoreDTO = new StockScoreDTO();
         stockScoreDTO.setStockNum(stockNum);
         stockScoreDTO.setDate(date);
-        stockScoreDTO.setStrategyId(CalculatorConsts.Indicator_Calc2);
-        stockScoreDTO.setStrategyName(CalculatorConsts.Indicator_Calc_DESC2);
+        stockScoreDTO.setStrategyId(CalculatorConsts.Indicator_Calc3);
+        stockScoreDTO.setStrategyName(CalculatorConsts.Indicator_Calc_DESC3);
         stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());

@@ -1,0 +1,53 @@
+package com.mwy.stock.reponstory.dao;
+
+import com.mwy.base.util.db.BaseDao;
+import com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO;
+import com.mwy.stock.reponstory.mapper.StockTimeInfoMapper;
+import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+@Slf4j
+@Component
+public class StockTimeInfoDao extends BaseDao<StockTimeInfoDO, StockTimeInfoMapper> implements InitializingBean {
+
+    @Resource
+    private EasyMoneyRepository easyMoneyRepository;
+    @Resource
+    private StockTimeInfoMapper stockTimeInfoMapper;
+
+    public void crowTimeInfo(String stockNum){
+        log.info("创建分时表:{}", stockNum);
+        List<StockTimeInfoDO> timeInfoDOS = easyMoneyRepository.crawlStockTimeInfoList(stockNum);
+        if (CollectionUtils.isEmpty(timeInfoDOS)){
+            return;
+        }
+        stockTimeInfoMapper.createTable(stockNum);
+
+
+        //删除历史抓取数据
+        String date = timeInfoDOS.get(0).getDate();
+
+        stockTimeInfoMapper.deleteByTable(stockNum,date);
+
+        stockTimeInfoMapper.insertByTables(timeInfoDOS,stockNum);
+//        for (StockTimeInfoDO timeInfoDO : timeInfoDOS) {
+//            stockTimeInfoMapper.insertByTable(timeInfoDO,timeInfoDO.getStockNum());
+//        }
+        log.info("抓取保存分时数据:{}", stockNum);
+    }
+
+    public double abnormal(String stockNum, List<String> dates) {
+        return stockTimeInfoMapper.abnormal(stockNum, dates);
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+
+    }
+}

@@ -15,8 +15,8 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @Slf4j
-@Component(CalculatorConsts.Indicator_Calc)
-public class IndicatorCalculator implements StockCalculator {
+@Component(CalculatorConsts.Trend_Calc)
+public class TrendCalculator implements StockCalculator {
 
     @Resource
     private StockDayInfoDao stockDayInfoDao;
@@ -27,8 +27,8 @@ public class IndicatorCalculator implements StockCalculator {
         StockScoreDTO stockScoreDTO = new StockScoreDTO();
         stockScoreDTO.setStockNum(stockNum);
         stockScoreDTO.setDate(date);
-        stockScoreDTO.setStrategyId(CalculatorConsts.Indicator_Calc);
-        stockScoreDTO.setStrategyName(CalculatorConsts.Indicator_Calc_DESC);
+        stockScoreDTO.setStrategyId(CalculatorConsts.Trend_Calc);
+        stockScoreDTO.setStrategyName(CalculatorConsts.Trend_Calc_DESC);
         stockScoreDTO.setScore(-100D);
         stockScoreDTO.setScoreDesc("无");
         stockScoreDTO.setUpdateDate(new Date());

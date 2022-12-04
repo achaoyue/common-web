@@ -7,6 +7,9 @@ public class CalculatorConsts {
     public static final String Indicator_Calc2 = "indicatorCalculator2";
     public static final String Indicator_Calc_DESC2 = "指标计算排序2";
 
+    public static final String Indicator_Calc3 = "indicatorCalculator3";
+    public static final String Indicator_Calc_DESC3 = "指标计算排序3";
+
     public static final String Amplitude_Calc = "amplitudeCalculator";
     public static final String Amplitude_Calc_DESC = "幅度计算排序";
 
@@ -24,4 +27,7 @@ public class CalculatorConsts {
 
     public static final String Top_Rise_Up_Calc = "topRiseUpCalculator";
     public static final String Top_Rise_Up_Calc_DESC = "当日涨幅排序";
+
+    public static final String Trend_Calc = "LH_RL_Calculator";
+    public static final String Trend_Calc_DESC = "趋势排序";
 }
