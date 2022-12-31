@@ -1,6 +1,7 @@
 package com.mwy.stock.controller;
 
 import com.mwy.base.co.Result;
+import com.mwy.stock.modal.dto.DataBoardDTO;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.service.StockService;
@@ -70,5 +71,11 @@ public class StockController {
         Map<String, List<StockDayInfoDO>> stockClosePrice = stockService.getStockClosePrice(stockNums, startTime, endTime);
         return Result.ofSuccess(stockClosePrice);
 
+    }
+
+    @GetMapping("/getDataBoard")
+    public Result getDataBoard(){
+        DataBoardDTO dataBoardDTO = stockService.queryDataBoard();
+        return Result.ofSuccess(dataBoardDTO);
     }
 }

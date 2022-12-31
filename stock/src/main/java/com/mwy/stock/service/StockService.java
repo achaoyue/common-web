@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mwy.base.util.Lock;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
 import com.mwy.stock.modal.converter.StockConvertor;
+import com.mwy.stock.modal.dto.DataBoardDTO;
 import com.mwy.stock.modal.dto.ProgressDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
@@ -13,6 +14,7 @@ import com.mwy.stock.reponstory.dao.StockTimeInfoDao;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
+import com.mwy.stock.reponstory.dao.modal.UpDownSize;
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -69,12 +71,9 @@ public class StockService {
                 .filter(e -> stockDOMap.containsKey(e.getStockNum()))
                 .peek(e -> e.setId(stockDOMap.get(e.getStockNum()).getId()))
                 .collect(Collectors.toList());
-        double i = 0;
+
         for (StockDO stockDO : updateStockDos) {
             stockDao.updateByIdSelective(stockDO);
-            stockTimeInfoDao.crowTimeInfo(stockDO.getStockNum());
-            i++;
-            log.info("process:{}",i/stockDTOList.size());
         }
 
         List<StockDO> insertStockDOs = stockDTOList.stream()
@@ -84,11 +83,17 @@ public class StockService {
                 .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(insertStockDOs)) {
             stockDao.insertList(insertStockDOs);
-            for (StockDO insertStockDO : insertStockDOs) {
-                stockTimeInfoDao.crowTimeInfo(insertStockDO.getStockNum());
-                i++;
-                log.info("process:{}",i/stockDTOList.size());
+        }
+
+        double i = 0;
+        for (EasyMoneyStockDTO moneyStockDTO : stockDTOList) {
+            i++;
+            if ("-".equals(moneyStockDTO.getIndustry())){
+                continue;
             }
+            stockTimeInfoDao.crowTimeInfo(moneyStockDTO.getStockNum());
+            crowStockDayInfo(moneyStockDTO.getStockNum());
+            log.info("process:{}",i/stockDTOList.size());
         }
     }
 
@@ -136,6 +141,10 @@ public class StockService {
         List<EasyMoneyStockDayInfoDTO> moneyStockDayInfoDTOS
                 = easyMoneyRepository.crawlStockDayInfoListByStockBean(dbStockDO.getStockNum());
         log.info("完成每日信息抓取{}-{}.耗时:{}", dbStockDO.getStockNum(), dbStockDO.getStockName(), System.currentTimeMillis() - start);
+        if (CollectionUtils.isEmpty(moneyStockDayInfoDTOS)){
+            log.info("抓取数据为空,{}",dbStockDO.getStockNum());
+            return;
+        }
         //指标计算
         IndicatorProxy indicatorProxy = new IndicatorProxy();
         indicatorProxy.getDayIndicatorList(moneyStockDayInfoDTOS);
@@ -155,10 +164,14 @@ public class StockService {
         log.info("完成每日信息存储{}-{}.耗时:{}", dbStockDO.getStockNum(), dbStockDO.getStockName(), System.currentTimeMillis() - start);
 
         Double currClose = dayInfoDOS.get(dayInfoDOS.size() -1).getClose();
-        Double curr3Close = dayInfoDOS.get(dayInfoDOS.size() -3).getClose();
-        Double curr5Close = dayInfoDOS.get(dayInfoDOS.size() -5).getClose();
-        dbStockDO.setUpDownRange3((currClose - curr3Close)/curr3Close);
-        dbStockDO.setUpDownRange5((currClose - curr5Close)/curr5Close);
+        if (dayInfoDOS.size() >= 3){
+            Double curr3Close = dayInfoDOS.get(dayInfoDOS.size() -3).getClose();
+            dbStockDO.setUpDownRange3((currClose - curr3Close)/curr3Close);
+        }
+        if (dayInfoDOS.size() >= 5){
+            Double curr5Close = dayInfoDOS.get(dayInfoDOS.size() -5).getClose();
+            dbStockDO.setUpDownRange5((currClose - curr5Close)/curr5Close);
+        }
         stockDao.updateByIdSelective(dbStockDO);
     }
 
@@ -182,5 +195,29 @@ public class StockService {
     public List<String> industryList() {
         List<String> list = stockDao.selectIndustry();
         return list;
+    }
+
+    public DataBoardDTO queryDataBoard(){
+        //涨跌数量
+        UpDownSize upDownSize = stockDao.queryUpDownSize();
+        //各行业涨跌情况
+        List<UpDownSize> upDownSizes = stockDao.queryUpDownSizeByIndustry();
+        //各行业龙头
+        List<StockDO> stockDOS = stockDao.queryTopByIndustry();
+        Map<String, StockDO> topIndustryMap = stockDOS.stream()
+                .collect(Collectors.toMap(e -> e.getIndustry(), e -> e));
+
+        List<StockDO> upTopList = stockDao.queryUpTop(100);
+        List<StockDO> downTopList = stockDao.queryDownTop(100);
+
+        DataBoardDTO boardDTO = new DataBoardDTO();
+        boardDTO.setUpSize(upDownSize.getUpSize());
+        boardDTO.setDownSize(upDownSize.getDownSize());
+        boardDTO.setIndustryUpDown(upDownSizes);
+        boardDTO.setIndustryTopMap(topIndustryMap);
+        boardDTO.setTopUpStockList(upTopList);
+        boardDTO.setTopDownStockList(downTopList);
+
+        return boardDTO;
     }
 }

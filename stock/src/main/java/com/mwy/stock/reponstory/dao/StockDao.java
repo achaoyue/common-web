@@ -1,6 +1,9 @@
 package com.mwy.stock.reponstory.dao;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.mwy.base.util.db.BaseDao;
+import com.mwy.stock.reponstory.dao.modal.UpDownSize;
 import com.mwy.stock.reponstory.mapper.StockMapper;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import lombok.extern.slf4j.Slf4j;
@@ -60,5 +63,33 @@ public class StockDao extends BaseDao<StockDO,StockMapper> implements Initializi
 
     public List<String> selectIndustry() {
         return stockMapper.selectIndustry();
+    }
+    public UpDownSize queryUpDownSize(){
+        return stockMapper.queryUpDownSize();
+    }
+
+    public List<UpDownSize> queryUpDownSizeByIndustry(){
+        return stockMapper.queryUpDownSizeByIndustry();
+    }
+
+    public List<StockDO> queryTopByIndustry() {
+        return stockMapper.queryTopByIndustry();
+    }
+
+    public List<StockDO> queryUpTop(int size) {
+        WeekendSqls<StockDO> sqls = WeekendSqls.custom();
+        Example example = Example.builder(StockDO.class).where(sqls).orderByDesc("upDownRange").build();
+        Page<Object> page = PageHelper.startPage(1,size,false);
+        return selectByExample(example);
+    }
+
+    public List<StockDO> queryDownTop(int size) {
+        WeekendSqls<StockDO> sqls = WeekendSqls.custom();
+        Example example = Example.builder(StockDO.class)
+                .where(sqls)
+                .orderByAsc("upDownRange")
+                .build();
+        Page<Object> page = PageHelper.startPage(1,size,false);
+        return selectByExample(example);
     }
 }

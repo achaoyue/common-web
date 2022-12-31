@@ -41,5 +41,23 @@
     <select id="selectIndustry" resultType="java.lang.String">
           select distinct industry from stock;
     </select>
+      <select id="queryUpDownSize" resultType="com.mwy.stock.reponstory.dao.modal.UpDownSize">
+          select COUNT(CASE WHEN up_down_range > 0 THEN 1 END) upSize,
+          COUNT(CASE WHEN 0>up_down_range THEN 1 END) downSize
+          from stock
+      </select>
+    <select id="queryUpDownSizeByIndustry" resultType="com.mwy.stock.reponstory.dao.modal.UpDownSize">
+        select * from (select industry,
+        COUNT(CASE WHEN up_down_range > 0 THEN 1 END) upSize,
+        COUNT(CASE WHEN 0 > up_down_range THEN 1 END) downSize,
+        count(*) allSize
+        from stock
+        group by industry) t
+        order by upSize/allSize desc
+    </select>
+    <select id="queryTopByIndustry" resultType="com.mwy.stock.reponstory.dao.modal.StockDO">
+        select *
+        from stock a where not exists(select * from stock b where a.industry = b.industry and b.total_market_value > a.total_market_value)
+    </select>
 
 </mapper>
