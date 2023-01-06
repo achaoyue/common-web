@@ -1,5 +1,6 @@
 package com.mwy.stock.modal.co;
 
+import com.mwy.base.util.db.YesOrNoEnum;
 import lombok.Data;
 
 @Data
@@ -45,4 +46,9 @@ public class StockScoreCO {
      * 所属板块
      */
     private String belongPlate;
+
+    /**
+     * 是否收藏
+     */
+    private YesOrNoEnum favorite;
 }

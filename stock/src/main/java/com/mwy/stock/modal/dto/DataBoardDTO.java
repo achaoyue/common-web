@@ -36,4 +36,9 @@ public class DataBoardDTO {
      * 跌幅排行
      */
     private List<StockDO> topDownStockList;
+
+    /**
+     * 收藏列表
+     */
+    private List<StockDO> favoriteStockList;
 }

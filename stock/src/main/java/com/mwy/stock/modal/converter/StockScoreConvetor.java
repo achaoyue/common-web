@@ -40,6 +40,7 @@ public class StockScoreConvetor {
             stockScoreCO.setIndustry(stockDO.getIndustry());
             stockScoreCO.setPlate(stockDO.getPlate());
             stockScoreCO.setBelongPlate(stockDO.getBelongPlate());
+            stockScoreCO.setFavorite(stockDO.getFavorite());
         }
 
         return stockScoreCO;

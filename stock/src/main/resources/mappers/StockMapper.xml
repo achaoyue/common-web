@@ -34,6 +34,8 @@
               `belong_plate` varchar(2048) DEFAULT NULL COMMENT '所属板块',
               `listing_date` varchar(255) DEFAULT NULL COMMENT '上市时间',
               `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+              `attribute` text DEFAULT NULL COMMENT '扩展',
+              `favorite` int DEFAULT NULL COMMENT '是否收藏中',
               PRIMARY KEY (`id`),
               UNIQUE KEY `uk_stock_num` (`stock_num`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

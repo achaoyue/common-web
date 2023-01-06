@@ -1,5 +1,6 @@
 package com.mwy.stock.reponstory.dao.modal;
 
+import com.mwy.base.util.db.YesOrNoEnum;
 import lombok.Data;
 import tk.mybatis.mapper.annotation.KeySql;
 
@@ -141,4 +142,14 @@ public class StockDO {
      * 更新时间
      */
     private Date updateDate;
+
+    /**
+     * 扩张
+     */
+    private String attribute;
+
+    /**
+     * 是否收藏中。1是，0否
+     */
+    private YesOrNoEnum favorite;
 }

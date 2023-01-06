@@ -27,6 +27,9 @@ public class StockDao extends BaseDao<StockDO,StockMapper> implements Initializi
 
 
     public StockDO getByStockNum(String stockNum){
+        if (StringUtils.isEmpty(stockNum)){
+            return null;
+        }
         WeekendSqls<StockDO> sqls = WeekendSqls.custom();
         sqls.andEqualTo(StockDO::getStockNum, stockNum);
         Example example = Example.builder(StockDO.class).where(sqls).build();

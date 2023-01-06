@@ -2,15 +2,13 @@ package com.mwy.stock.controller;
 
 import com.mwy.base.co.Result;
 import com.mwy.stock.modal.dto.DataBoardDTO;
+import com.mwy.stock.modal.qry.FavoriteEditParam;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.service.StockService;
 import com.mwy.stock.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -77,5 +75,17 @@ public class StockController {
     public Result getDataBoard(){
         DataBoardDTO dataBoardDTO = stockService.queryDataBoard();
         return Result.ofSuccess(dataBoardDTO);
+    }
+
+    @PostMapping("/editFavorite")
+    public Result editFavorite(@RequestBody FavoriteEditParam favoriteEditParam){
+        stockService.editFavorite(favoriteEditParam);
+        return Result.ofSuccess(true);
+    }
+
+    @GetMapping("/queryFavorite")
+    public Result queryFavorite(){
+        List<StockDO> list =  stockService.queryFavorite();
+        return Result.ofSuccess(list);
     }
 }

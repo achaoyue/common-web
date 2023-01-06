@@ -2,12 +2,15 @@ package com.mwy.stock.service;
 
 import com.google.common.collect.Lists;
 import com.mwy.base.util.Lock;
+import com.mwy.base.util.db.YesOrNoEnum;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
 import com.mwy.stock.modal.converter.StockConvertor;
 import com.mwy.stock.modal.dto.DataBoardDTO;
 import com.mwy.stock.modal.dto.ProgressDTO;
+import com.mwy.stock.modal.dto.StockAttribute;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
+import com.mwy.stock.modal.qry.FavoriteEditParam;
 import com.mwy.stock.reponstory.dao.StockDao;
 import com.mwy.stock.reponstory.dao.StockDayInfoDao;
 import com.mwy.stock.reponstory.dao.StockTimeInfoDao;
@@ -26,6 +29,7 @@ import tk.mybatis.mapper.weekend.WeekendSqls;
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -217,7 +221,27 @@ public class StockService {
         boardDTO.setIndustryTopMap(topIndustryMap);
         boardDTO.setTopUpStockList(upTopList);
         boardDTO.setTopDownStockList(downTopList);
+        boardDTO.setFavoriteStockList(queryFavorite());
 
         return boardDTO;
+    }
+
+    public void editFavorite(FavoriteEditParam favoriteEditParam) {
+        StockDO stockDO = stockDao.getByStockNum(favoriteEditParam.getStockNum());
+        if (favoriteEditParam.getOpType() == FavoriteEditParam.OpType.ADD){
+            StockAttribute stockAttribute = new StockAttribute();
+            stockAttribute.setAddFavoriteDate(new Date());
+            stockAttribute.setInitPrice(stockDO.getClose());
+            stockDO.setFavorite(YesOrNoEnum.Y);
+        }else if (favoriteEditParam.getOpType() == FavoriteEditParam.OpType.DELETE){
+            stockDO.setFavorite(YesOrNoEnum.N);
+        }
+        stockDao.updateById(stockDO);
+    }
+
+    public List<StockDO> queryFavorite() {
+        StockDO query = new StockDO();
+        query.setFavorite(YesOrNoEnum.Y);
+        return stockDao.select(query);
     }
 }
