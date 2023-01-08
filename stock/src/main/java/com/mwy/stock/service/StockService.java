@@ -1,6 +1,7 @@
 package com.mwy.stock.service;
 
 import com.google.common.collect.Lists;
+import com.mwy.base.util.DingDingUtil;
 import com.mwy.base.util.Lock;
 import com.mwy.base.util.db.YesOrNoEnum;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
@@ -19,6 +20,7 @@ import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
 import com.mwy.stock.reponstory.dao.modal.UpDownSize;
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
+import com.mwy.stock.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -99,6 +101,7 @@ public class StockService {
             crowStockDayInfo(moneyStockDTO.getStockNum());
             log.info("process:{}",i/stockDTOList.size());
         }
+        DingDingUtil.sendMsg("","数据爬取完成："+ DateUtils.date2String(new Date(),"yyyy-MM-dd HH:mm:ss"));
     }
 
     public void stop(){
