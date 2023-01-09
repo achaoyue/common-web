@@ -1,5 +1,6 @@
 package com.mwy.stock.service;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.mwy.base.util.DingDingUtil;
 import com.mwy.base.util.Lock;
@@ -34,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -235,6 +237,7 @@ public class StockService {
             StockAttribute stockAttribute = new StockAttribute();
             stockAttribute.setAddFavoriteDate(new Date());
             stockAttribute.setInitPrice(stockDO.getClose());
+            stockDO.setAttribute(JSON.toJSONString(stockAttribute));
             stockDO.setFavorite(YesOrNoEnum.Y);
         }else if (favoriteEditParam.getOpType() == FavoriteEditParam.OpType.DELETE){
             stockDO.setFavorite(YesOrNoEnum.N);
@@ -245,6 +248,15 @@ public class StockService {
     public List<StockDO> queryFavorite() {
         StockDO query = new StockDO();
         query.setFavorite(YesOrNoEnum.Y);
-        return stockDao.select(query);
+        List<StockDO> stockDOList = stockDao.select(query);
+        stockDOList.sort((e1,e2)->{
+            StockAttribute attribute1 = StockAttribute.fromJson(e1.getAttribute());
+            StockAttribute attribute2 = StockAttribute.fromJson(e2.getAttribute());
+            if (attribute1 == null || attribute2 == null){
+                return 0;
+            }
+            return attribute2.getAddFavoriteDate().compareTo(attribute1.getAddFavoriteDate());
+        });
+        return stockDOList;
     }
 }
