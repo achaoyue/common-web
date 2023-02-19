@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface StockTimeInfoMapper extends MyBaseMapper<StockTimeInfoDO> {
+public interface StockTimeInfoMapper {
 
     int createTable(@Param("stockNum") String stockNum);
 
@@ -19,4 +19,8 @@ public interface StockTimeInfoMapper extends MyBaseMapper<StockTimeInfoDO> {
     int insertByTables(@Param("timeInfoDOs") List<StockTimeInfoDO> timeInfoDO, @Param("stockNum") String stockNum);
 
     double abnormal(@Param("stockNum") String stockNum, @Param("dates") List<String> date);
+
+    List<StockTimeInfoDO> selectByDate(@Param("stockNum") String stockNum, @Param("date") String date);
+
+    String maxDate(@Param("stockNum") String stockNum);
 }

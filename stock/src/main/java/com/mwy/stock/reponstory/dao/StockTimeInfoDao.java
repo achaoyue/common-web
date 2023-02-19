@@ -1,20 +1,21 @@
 package com.mwy.stock.reponstory.dao;
 
-import com.mwy.base.util.db.BaseDao;
 import com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO;
 import com.mwy.stock.reponstory.mapper.StockTimeInfoMapper;
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
+import com.mwy.stock.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
 @Component
-public class StockTimeInfoDao extends BaseDao<StockTimeInfoDO, StockTimeInfoMapper> implements InitializingBean {
+public class StockTimeInfoDao implements InitializingBean {
 
     @Resource
     private EasyMoneyRepository easyMoneyRepository;
@@ -49,5 +50,10 @@ public class StockTimeInfoDao extends BaseDao<StockTimeInfoDO, StockTimeInfoMapp
     @Override
     public void afterPropertiesSet() {
 
+    }
+
+    public List<StockTimeInfoDO> getLastDay(String stockNum) {
+        String date = stockTimeInfoMapper.maxDate(stockNum);
+        return stockTimeInfoMapper.selectByDate(stockNum,date);
     }
 }

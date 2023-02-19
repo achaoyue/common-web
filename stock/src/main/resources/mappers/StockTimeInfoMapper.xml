@@ -33,6 +33,12 @@
             #{item}
         </foreach>
     </select>
+    <select id="selectByDate" resultType="com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO">
+        select * from stock_time_info_${stockNum} where stock_num = #{stockNum} and date = #{date}
+    </select>
+    <select id="maxDate" resultType="java.lang.String">
+        select max(date) from stock_time_info_${stockNum}
+    </select>
 
     <insert id="insertByTable">
         insert into  stock_time_info_${stockNum} (

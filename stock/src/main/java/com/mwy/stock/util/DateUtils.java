@@ -48,4 +48,8 @@ public class DateUtils {
     public static Date addDay(Date now, int day){
         return new Date(now.getTime() + 1000*60*60*24*day);
     }
+
+    public static String nowStr() {
+        return date2String(new Date(), "yyyy-MM-dd HH:mm:ss");
+    }
 }

@@ -1,6 +1,7 @@
 package com.mwy.stock.controller;
 
 import com.mwy.base.co.Result;
+import com.mwy.stock.config.SwitchConfig;
 import com.mwy.stock.modal.dto.DataBoardDTO;
 import com.mwy.stock.modal.qry.FavoriteEditParam;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
@@ -87,5 +88,16 @@ public class StockController {
     public Result queryFavorite(){
         List<StockDO> list =  stockService.queryFavorite();
         return Result.ofSuccess(list);
+    }
+
+    @GetMapping("/testNotice")
+    public Result test(String stockNum){
+        return Result.ofSuccess(stockService.test(stockNum));
+    }
+
+    @GetMapping("/changeWatch")
+    public Result stopWatch(Boolean watch){
+        SwitchConfig.stopWatch = !watch;
+        return Result.ofSuccess(SwitchConfig.stopWatch);
     }
 }

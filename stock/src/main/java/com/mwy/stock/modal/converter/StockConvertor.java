@@ -1,15 +1,14 @@
 package com.mwy.stock.modal.converter;
 
 import com.mwy.stock.modal.dto.StockScoreDTO;
+import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
-import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
+import com.mwy.stock.reponstory.dao.modal.StockHistoryDO;
 import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +16,37 @@ import java.util.stream.Collectors;
 public class StockConvertor {
     public static StockDO toDO(EasyMoneyStockDTO stockDTO) {
         StockDO stockDO = new StockDO();
+        stockDO.setId(stockDTO.getId());
+        stockDO.setStockNum(stockDTO.getStockNum());
+        stockDO.setStockName(stockDTO.getStockName());
+        stockDO.setHigh(stockDTO.getHigh());
+        stockDO.setLow(stockDTO.getLow());
+        stockDO.setOpen(stockDTO.getOpen());
+        stockDO.setClose(stockDTO.getClose());
+        stockDO.setPreClose(stockDTO.getPreClose());
+        stockDO.setTurnOverrate(stockDTO.getTurnOverrate());
+        stockDO.setAmplitude(stockDTO.getAmplitude());
+        stockDO.setUpDownPrices(stockDTO.getUpDownPrices());
+        stockDO.setUpDownRange(stockDTO.getUpDownRange());
+        stockDO.setUpDownRange3(stockDTO.getUpDownRange3());
+        stockDO.setUpDownRange5(stockDTO.getUpDownRange5());
+        stockDO.setVolume(stockDTO.getVolume());
+        stockDO.setAmount(stockDTO.getAmount());
+        stockDO.setFlowMarketValue(stockDTO.getFlowMarketValue());
+        stockDO.setTotalFlowShares(stockDTO.getTotalFlowShares());
+        stockDO.setTotalMarketValue(stockDTO.getTotalMarketValue());
+        stockDO.setTotalShares(stockDTO.getTotalShares());
+        stockDO.setIndustry(stockDTO.getIndustry());
+        stockDO.setPlate(stockDTO.getPlate());
+        stockDO.setBelongPlate(stockDTO.getBelongPlate());
+        stockDO.setQuantityRelativeRatio(stockDTO.getQuantityRelativeRatio());
+        stockDO.setListingDate(stockDTO.getListingDate());
+        stockDO.setUpdateDate(stockDTO.getUpdateDate());
+        return stockDO;
+    }
+
+    public static StockHistoryDO toHistoryDO(EasyMoneyStockDTO stockDTO) {
+        StockHistoryDO stockDO = new StockHistoryDO();
         stockDO.setId(stockDTO.getId());
         stockDO.setStockNum(stockDTO.getStockNum());
         stockDO.setStockName(stockDTO.getStockName());

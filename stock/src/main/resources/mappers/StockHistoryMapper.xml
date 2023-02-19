@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mwy.stock.reponstory.mapper.StockHistoryMapper">
+
+    <update id="createTable">
+        CREATE TABLE if not exists `stock_history_minute` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `stock_num` varchar(255) DEFAULT NULL COMMENT '股票编码',
+            `stock_name` varchar(255) DEFAULT NULL COMMENT '股票名称',
+            `high` double DEFAULT NULL COMMENT '最高价',
+            `low` double DEFAULT NULL COMMENT '最低价',
+            `open` double DEFAULT NULL COMMENT '开盘价',
+            `close` double DEFAULT NULL COMMENT '收盘价',
+            `pre_close` double DEFAULT NULL COMMENT '昨收盘价',
+            `turn_overrate` double DEFAULT NULL COMMENT '换手率',
+            `amplitude` double DEFAULT NULL COMMENT '振幅，一天最大涨幅-最小涨幅',
+            `up_down_prices` double DEFAULT NULL COMMENT '涨跌额度',
+            `up_down_range` double DEFAULT NULL COMMENT '涨幅',
+            `up_down_range3` double DEFAULT NULL COMMENT '3日涨幅',
+            `up_down_range5` double DEFAULT NULL COMMENT '5日涨幅',
+            `volume` double DEFAULT NULL COMMENT '成交量',
+            `amount` double DEFAULT NULL COMMENT '成交额',
+            `flow_market_value` double DEFAULT NULL COMMENT '流通市值',
+            `total_flow_shares` double DEFAULT NULL COMMENT '流通股',
+            `total_market_value` double DEFAULT NULL COMMENT '总市值',
+            `total_shares` double DEFAULT NULL COMMENT '总股本',
+            `quantity_relative_ratio` double DEFAULT NULL COMMENT '量比',
+            `industry` varchar(255) DEFAULT '' COMMENT '行业',
+            `plate` varchar(255) DEFAULT NULL COMMENT '板块',
+            `belong_plate` varchar(2048) DEFAULT NULL COMMENT '所属板块',
+            `listing_date` varchar(255) DEFAULT NULL COMMENT '上市时间',
+            `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+            `attribute` text DEFAULT NULL COMMENT '扩展',
+            `favorite` int DEFAULT NULL COMMENT '是否收藏中',
+            PRIMARY KEY (`id`),
+            KEY `idx_stockNum` (`stock_num`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    </update>
+
+</mapper>
