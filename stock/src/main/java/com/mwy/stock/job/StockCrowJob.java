@@ -53,7 +53,7 @@ public class StockCrowJob {
     }
 
     //1分钟检查涨幅通知
-    @Scheduled(cron = "10 * 9 * * ?")
+    @Scheduled(cron = "10 0 9 * * ?")
     public void clearHistory() {
         stockService.clearHistory();
         log.info("清理正常结束");

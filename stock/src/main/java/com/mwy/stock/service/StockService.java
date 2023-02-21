@@ -262,6 +262,10 @@ public class StockService {
         return boardDTO;
     }
 
+    public List<UpDownSize> queryUpDownSizeByIndustry(){
+        return stockDao.queryUpDownSizeByIndustry();
+    }
+
     public void editFavorite(FavoriteEditParam favoriteEditParam) {
         StockDO stockDO = stockDao.getByStockNum(favoriteEditParam.getStockNum());
         if (favoriteEditParam.getOpType() == FavoriteEditParam.OpType.ADD) {
@@ -342,9 +346,9 @@ public class StockService {
         StockHistoryDO two = stockHistoryDOList.get(2);
         StockHistoryDO tree = stockHistoryDOList.get(3);
 
-        double minPrice = Stream.of(one.getClose(), two.getClose(), tree.getClose()).mapToDouble(e -> e).min().getAsDouble();
-        double percent = (now.getClose() - minPrice) / minPrice;
-        boolean upRangeNeedNotice = percent > 0.1 && now.getUpDownRange() < 7 && now.getUpDownPrices() > -6;
+        double minUpDownRange = Stream.of(one.getUpDownRange(), two.getUpDownRange(), tree.getUpDownRange()).mapToDouble(e -> e).min().getAsDouble();
+        double percent = now.getUpDownRange() - minUpDownRange;
+        boolean upRangeNeedNotice = percent > 1 && now.getUpDownRange() < 7 && now.getUpDownPrices() > -6;
 
         boolean abnormal = false;
         if (upRangeNeedNotice) {

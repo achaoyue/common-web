@@ -78,6 +78,11 @@ public class StockController {
         return Result.ofSuccess(dataBoardDTO);
     }
 
+    @GetMapping("/queryUpDownSizeByIndustry")
+    public Result queryUpDownSizeByIndustry(){
+        return Result.ofSuccess(stockService.queryUpDownSizeByIndustry());
+    }
+
     @PostMapping("/editFavorite")
     public Result editFavorite(@RequestBody FavoriteEditParam favoriteEditParam){
         stockService.editFavorite(favoriteEditParam);
@@ -96,8 +101,8 @@ public class StockController {
     }
 
     @GetMapping("/changeWatch")
-    public Result stopWatch(Boolean watch){
-        SwitchConfig.stopWatch = !watch;
+    public Result stopWatch(Boolean stopWatch){
+        SwitchConfig.stopWatch = stopWatch;
         return Result.ofSuccess(SwitchConfig.stopWatch);
     }
 }
