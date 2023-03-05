@@ -21,6 +21,7 @@ import com.mwy.stock.reponstory.dao.StockTimeInfoDao;
 import com.mwy.stock.reponstory.dao.modal.*;
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
 import com.mwy.stock.util.DateUtils;
+import com.mwy.stock.util.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -324,6 +325,9 @@ public class StockService {
     private void sendNotice(EasyMoneyStockDTO stockDTO, List<StockHistoryDO> stockHistoryDOList) {
         String msg = stockDTO.getStockNum()
                 + "-" + stockDTO.getStockName() + "\n"
+                + "行业:" + stockDTO.getIndustry() + "\n"
+                + "当前价格:" + stockDTO.getClose() + "\n"
+                + "市值:" + NumberUtil.format(stockDTO.getTotalMarketValue()) + "\n"
                 + "当前涨幅:" + stockDTO.getUpDownRange();
         DingDingUtil.sendMsg("", "发现异动：" + msg);
     }

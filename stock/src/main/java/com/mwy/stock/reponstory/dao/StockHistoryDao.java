@@ -31,7 +31,7 @@ public class StockHistoryDao extends BaseDao<StockHistoryDO, StockHistoryMapper>
         sqls.andEqualTo(StockHistoryDO::getStockNum, stockNum);
         Example example = Example.builder(StockHistoryDO.class)
                 .where(sqls)
-                .orderByDesc("update_date")
+                .orderByDesc("updateDate")
                 .build();
         return stockHistoryMapper.selectByExample(example);
     }
