@@ -7,11 +7,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.mwy.base.util.HttpsUtils;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
+import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockFundDTO;
 import com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+
 
 /**
  * 东方财富爬虫
@@ -82,6 +84,38 @@ public class EasyMoneyRepository {
         return list;
     }
 
+    public EasyMoneyStockFundDTO getStockFund(String stockNum){
+        String url = "http://push2.eastmoney.com/api/qt/stock/get";
+
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("ut", "fa5fd1943c7b386f172d6893dbfba10b");
+        param.put("fltt", "2");
+        param.put("fid", "f3");
+        param.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
+        param.put("fields", "f135,f136,f137,f138,f139,f141,f142,f144,f145,f147,f148,f140,f143,f146,f149,f193,f196,f194,f195,f197");
+        param.put("invt", "2");
+        if (stockNum.startsWith("6")) {
+            param.put("secid", "1." + stockNum);
+        } else if (stockNum.startsWith("00") || stockNum.startsWith("3")) {
+            param.put("secid", "0." + stockNum);
+        } else {
+            param.put("secid", "1." + stockNum);
+        }
+        
+        String sendResult = HttpsUtils.doGetString(url, param);
+        JSONObject map = JSONObject.parseObject(sendResult).getJSONObject("data");
+
+        EasyMoneyStockFundDTO stockBean = new EasyMoneyStockFundDTO();
+        stockBean.setMainMoneyIn(objectToBigDecimal(map.get("f135")));
+        stockBean.setMainMoneyOut(objectToBigDecimal(map.get("f136")));
+        stockBean.setSuperBigMoneyIn(objectToBigDecimal(map.get("f138")));
+        stockBean.setSuperBigMoneyOut(objectToBigDecimal(map.get("f139")));
+        stockBean.setBigMoneyIn(objectToBigDecimal(map.get("f141")));
+        stockBean.setBigMoneyOut(objectToBigDecimal(map.get("f142")));
+
+        return stockBean;
+    }
+
     public List<EasyMoneyStockDTO> getStockListByScript() {
         String url = "http://19.push2.eastmoney.com/api/qt/clist/get";
 
@@ -144,6 +178,33 @@ public class EasyMoneyRepository {
             stockBean.setPlate((String) map.get("f102"));
             stockBean.setBelongPlate((String) map.get("f103"));
             stockBean.setUpdateDate(new Date());
+//            stockBean.setMainMoneyIn(objectToBigDecimal(map.get("f135")));
+//            stockBean.setMainMoneyOut(objectToBigDecimal(map.get("f136")));
+//            stockBean.setSuperBigMoneyIn(objectToBigDecimal(map.get("f138")));
+//            stockBean.setSuperBigMoneyOut(objectToBigDecimal(map.get("f139")));
+//            stockBean.setBigMoneyIn(objectToBigDecimal(map.get("f141")));
+//            stockBean.setBigMoneyOut(objectToBigDecimal(map.get("f142")));
+//            stockBean.setBuyOne(objectToBigDecimal(map.get("f20")));
+//            stockBean.setBuyOnePrice(objectToBigDecimal(map.get("f19")));
+//            stockBean.setBuyTwo(objectToBigDecimal(map.get("f18")));
+//            stockBean.setBuyTwoPrice(objectToBigDecimal(map.get("f17")));
+//            stockBean.setBuyThree(objectToBigDecimal(map.get("f`6")));
+//            stockBean.setBuyThreePrice(objectToBigDecimal(map.get("f15")));
+//            stockBean.setBuyFour(objectToBigDecimal(map.get("f14")));
+//            stockBean.setBuyFourPrice(objectToBigDecimal(map.get("f13")));
+//            stockBean.setBuyFive(objectToBigDecimal(map.get("f12")));
+//            stockBean.setBuyFivePrice(objectToBigDecimal(map.get("f11")));
+//
+//            stockBean.setSoldOne(objectToBigDecimal(map.get("f40")));
+//            stockBean.setSoldOnePrice(objectToBigDecimal(map.get("f39")));
+//            stockBean.setSoldTwo(objectToBigDecimal(map.get("f38")));
+//            stockBean.setSoldTwoPrice(objectToBigDecimal(map.get("f37")));
+//            stockBean.setSoldThree(objectToBigDecimal(map.get("f36")));
+//            stockBean.setSoldThreePrice(objectToBigDecimal(map.get("f35")));
+//            stockBean.setSoldFour(objectToBigDecimal(map.get("f34")));
+//            stockBean.setSoldFourPrice(objectToBigDecimal(map.get("f33")));
+//            stockBean.setSoldFive(objectToBigDecimal(map.get("f32")));
+//            stockBean.setSoldFivePrice(objectToBigDecimal(map.get("f31")));
 
             stockBeanList.add(stockBean);
         }

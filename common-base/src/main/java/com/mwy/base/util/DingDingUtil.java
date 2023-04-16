@@ -13,4 +13,11 @@ public class DingDingUtil {
         String s = HttpsUtils.doPost(url, content);
         log.info("通知发送OK。 {}", s);
     }
+
+    public static void sendMsg(String token, String msg,boolean atAll){
+        String url = NoticeUrl + (StringUtils.isEmpty(token) ? defaultToken : token);
+        String content = "{\"msgtype\":\"text\",\"text\":{\"content\":\"通知:"+msg+"\"},\"at\":{\"isAtAll\":"+atAll+"}}";
+        String s = HttpsUtils.doPost(url, content);
+        log.info("通知发送OK。 {}", s);
+    }
 }

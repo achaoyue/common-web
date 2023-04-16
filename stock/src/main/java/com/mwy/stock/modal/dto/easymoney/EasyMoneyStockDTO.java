@@ -145,4 +145,58 @@ public class EasyMoneyStockDTO {
      * 更新时间
      */
     private Date updateDate;
+
+    /**
+     * 主力流入金额
+     */
+    private Double MainMoneyIn;
+
+    /**
+     * 主力流出金额
+     */
+    private Double MainMoneyOut;
+
+    /**
+     * 超大单流入金额
+     */
+    private Double superBigMoneyIn;
+
+    /**
+     * 超大单流出
+     */
+    private Double superBigMoneyOut;
+
+    /**
+     * 大单流入金额
+     */
+    private Double bigMoneyIn;
+
+    /**
+     * 大单流出金额
+     */
+    private Double bigMoneyOut;
+
+    private Double buyOne;
+    private Double buyTwo;
+    private Double buyThree;
+    private Double buyFour;
+    private Double buyFive;
+
+    private Double buyOnePrice;
+    private Double buyTwoPrice;
+    private Double buyThreePrice;
+    private Double buyFourPrice;
+    private Double buyFivePrice;
+
+    private Double soldOne;
+    private Double soldTwo;
+    private Double soldThree;
+    private Double soldFour;
+    private Double soldFive;
+
+    private Double soldOnePrice;
+    private Double soldTwoPrice;
+    private Double soldThreePrice;
+    private Double soldFourPrice;
+    private Double soldFivePrice;
 }

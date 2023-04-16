@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.mwy.base.util.DingDingUtil;
 import com.mwy.base.util.Lock;
 import com.mwy.base.util.db.YesOrNoEnum;
+import com.mwy.stock.config.NoticeConfig;
 import com.mwy.stock.config.SwitchConfig;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
 import com.mwy.stock.modal.converter.StockConvertor;
@@ -13,17 +14,16 @@ import com.mwy.stock.modal.dto.ProgressDTO;
 import com.mwy.stock.modal.dto.StockAttribute;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
+import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockFundDTO;
 import com.mwy.stock.modal.qry.FavoriteEditParam;
-import com.mwy.stock.reponstory.dao.StockDao;
-import com.mwy.stock.reponstory.dao.StockDayInfoDao;
-import com.mwy.stock.reponstory.dao.StockHistoryDao;
-import com.mwy.stock.reponstory.dao.StockTimeInfoDao;
+import com.mwy.stock.reponstory.dao.*;
 import com.mwy.stock.reponstory.dao.modal.*;
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
 import com.mwy.stock.util.DateUtils;
 import com.mwy.stock.util.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -60,6 +60,9 @@ public class StockService {
 
     @Resource(name = "bizThreadPool")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    @Resource
+    private StockNoticeHistoryDao stockNoticeHistoryDao;
 
     private static boolean STOP = false;
 
@@ -246,7 +249,7 @@ public class StockService {
         //各行业龙头
         List<StockDO> stockDOS = stockDao.queryTopByIndustry();
         Map<String, StockDO> topIndustryMap = stockDOS.stream()
-                .collect(Collectors.toMap(e -> e.getIndustry(), e -> e));
+                .collect(Collectors.toMap(e -> e.getIndustry(), e -> e,(e1,e2)->e1));
 
         List<StockDO> upTopList = stockDao.queryUpTop(100);
         List<StockDO> downTopList = stockDao.queryDownTop(100);
@@ -263,7 +266,7 @@ public class StockService {
         return boardDTO;
     }
 
-    public List<UpDownSize> queryUpDownSizeByIndustry(){
+    public List<UpDownSize> queryUpDownSizeByIndustry() {
         return stockDao.queryUpDownSizeByIndustry();
     }
 
@@ -297,12 +300,13 @@ public class StockService {
     }
 
     public void doNotice() {
-        if (!isTradeDay()){
-            log.info("非交易日忽略监控,{}", DateUtils.nowStr());
+        String nowStr = DateUtils.nowStr();
+        if (!isTradeDay()) {
+            log.info("非交易日忽略监控,{}", nowStr);
             return;
         }
-        if(SwitchConfig.stopWatch){
-            log.info("停止监控,{}", DateUtils.nowStr());
+        if (SwitchConfig.stopWatch) {
+            log.info("停止监控,{}", nowStr);
             return;
         }
 
@@ -311,32 +315,106 @@ public class StockService {
                 .map(e -> StockConvertor.toHistoryDO(e))
                 .collect(Collectors.toList());
         stockHistoryDao.insertList(updateStockDos);
-        log.info("保存分钟监控结束,{}", DateUtils.nowStr());
+        log.info("保存分钟监控结束,{}", nowStr);
 
         for (EasyMoneyStockDTO easyMoneyStockDTO : stockDTOList) {
             List<StockHistoryDO> stockHistoryDOList = stockHistoryDao.getLatest(easyMoneyStockDTO.getStockNum(), 50);
             boolean needSendNotice = isNeedSendNotice(easyMoneyStockDTO.getStockNum(), stockHistoryDOList);
+            //满足顺滑上涨要求
             if (needSendNotice) {
-                sendNotice(easyMoneyStockDTO, stockHistoryDOList);
+                boolean goodTrend = isGoodTrend(easyMoneyStockDTO);
+                buildNotice(easyMoneyStockDTO, stockHistoryDOList,goodTrend, nowStr);
             }
+        }
+
+        sendNotice(nowStr);
+    }
+
+    private boolean isGoodTrend(EasyMoneyStockDTO easyMoneyStockDTO) {
+        String stockNum = easyMoneyStockDTO.getStockNum();
+        int size = 33;
+        List<StockDayInfoDO> stockDayInfoDOS = stockDayInfoDao.selectTopN(stockNum, DateUtils.nowDayStr(), size);
+        if (stockDayInfoDOS.size() < size){
+            log.info("数据量太少,忽略:{}", stockNum);
+            return false;
+        }
+        //macd向上
+        boolean macdUpTrend = stockDayInfoDOS.get(0).getMacd() > stockDayInfoDOS.get(1).getMacd()
+                && stockDayInfoDOS.get(1).getMacd() > stockDayInfoDOS.get(2).getMacd()
+                && stockDayInfoDOS.get(2).getMacd() > stockDayInfoDOS.get(3).getMacd();
+
+        //cci向上
+        boolean cciUpTrend = stockDayInfoDOS.get(0).getCci() > stockDayInfoDOS.get(2).getCci();
+
+        //资金流向上
+        EasyMoneyStockFundDTO stockFund = easyMoneyRepository.getStockFund(stockNum);
+        boolean mainIn = stockFund.getMainMoneyIn() > stockFund.getMainMoneyOut();
+
+        //价格在低位或突破
+        Double maxClose = stockDayInfoDOS.stream()
+                .max(Comparator.comparing(StockDayInfoDO::getClose))
+                .map(e -> e.getClose())
+                .orElse(0D);
+        boolean perfectPosition = maxClose > easyMoneyStockDTO.getClose()*1.2 || easyMoneyStockDTO.getClose() > maxClose;
+        log.info("{}趋势分析结论:macd向上{},cci向上{},资金流入{},价格在低位{}",stockNum,macdUpTrend,cciUpTrend,mainIn,perfectPosition);
+        return macdUpTrend && cciUpTrend && mainIn && perfectPosition;
+    }
+
+    private void sendNotice(String nowStr) {
+        List<StockNoticeHistoryDO> historyDOList = stockNoticeHistoryDao.getAllBySendLog(nowStr);
+        List<List<StockNoticeHistoryDO>> partitions = Lists.partition(historyDOList, 20);
+        for (List<StockNoticeHistoryDO> partition : partitions) {
+            String noticeAllMsg = partition.stream().map(e -> StockNoticeHistoryAttribute.fromJson(e.getAttribute()))
+                    .map(e -> e.getNoticeMsg())
+                    .collect(Collectors.joining("\n--------\n"));
+            boolean atAll = partition.stream().map(e -> StockNoticeHistoryAttribute.fromJson(e.getAttribute()))
+                    .anyMatch(e -> e.isGoodTrend());
+            DingDingUtil.sendMsg(NoticeConfig.stockNoticeToken2, noticeAllMsg,atAll);
         }
     }
 
-    private void sendNotice(EasyMoneyStockDTO stockDTO, List<StockHistoryDO> stockHistoryDOList) {
+    private void buildNotice(EasyMoneyStockDTO stockDTO, List<StockHistoryDO> stockHistoryDOList,boolean goodTrend, String sendLog) {
+
+        String noticeDay = DateUtils.nowDayStr();
+        StockNoticeHistoryDO noticeHistoryDO = stockNoticeHistoryDao.getByStockNum(stockDTO.getStockNum(), noticeDay);
+        if (noticeHistoryDO == null) {
+            noticeHistoryDO = new StockNoticeHistoryDO();
+        }
+
+        noticeHistoryDO.setStockNum(stockDTO.getStockNum());
+        noticeHistoryDO.setStockName(stockDTO.getStockName());
+        noticeHistoryDO.setNoticeCount(ObjectUtils.defaultIfNull(noticeHistoryDO.getNoticeCount(), 0) + 1);
+        noticeHistoryDO.setSendLog(sendLog);
+        noticeHistoryDO.setNoticeDay(noticeDay);
+
         String msg = stockDTO.getStockNum()
                 + "-" + stockDTO.getStockName() + "\n"
                 + "行业:" + stockDTO.getIndustry() + "\n"
                 + "当前价格:" + stockDTO.getClose() + "\n"
                 + "市值:" + NumberUtil.format(stockDTO.getTotalMarketValue()) + "\n"
-                + "当前涨幅:" + stockDTO.getUpDownRange();
-        DingDingUtil.sendMsg("", "发现异动：" + msg);
+                + "当前涨幅:" + stockDTO.getUpDownRange() + "\n"
+                + "第" + noticeHistoryDO.getNoticeCount() + "次通知";
+        StockNoticeHistoryAttribute attribute = new StockNoticeHistoryAttribute();
+        attribute.setNoticeMsg(msg);
+        attribute.setGoodTrend(goodTrend);
+        noticeHistoryDO.setAttribute(JSON.toJSONString(attribute));
+        stockNoticeHistoryDao.upsert(noticeHistoryDO);
     }
 
-    public boolean test(String stockNum){
-        List<StockHistoryDO> stockHistoryDOList = stockHistoryDao.getLatest(stockNum, 50);
-        boolean needSendNotice = isNeedSendNotice(stockNum, stockHistoryDOList);
-        System.out.println(needSendNotice);
-        return needSendNotice;
+    public boolean test(String stockNum) {
+//        String nowStr = DateUtils.nowStr();
+//        List<EasyMoneyStockDTO> stockDTOList = easyMoneyRepository.getStockListByScript();
+//        buildNotice(stockDTOList.get(0), null,false, nowStr);
+////        buildNotice(stockDTOList.get(1),null, nowStr);
+//        buildNotice(stockDTOList.get(2), null,false, nowStr);
+//        sendNotice(nowStr);
+        EasyMoneyStockDTO easyMoneyStockDTO = new EasyMoneyStockDTO();
+        easyMoneyStockDTO.setStockNum(stockNum);
+        easyMoneyStockDTO.setClose(33.55);
+        boolean goodTrend = isGoodTrend(easyMoneyStockDTO);
+        System.out.println(goodTrend);
+
+        return true;
     }
 
     private boolean isNeedSendNotice(String stockNum, List<StockHistoryDO> stockHistoryDOList) {
@@ -382,5 +460,13 @@ public class StockService {
 
     public void clearHistory() {
         stockHistoryDao.deleteAll();
+    }
+
+    public List<StockNoticeHistoryDO> queryNoticeList(String day) {
+        if (StringUtils.isEmpty(day)) {
+            day = DateUtils.nowDayStr();
+        }
+        List<StockNoticeHistoryDO> noticeHistoryDOS = stockNoticeHistoryDao.getAllByDay(day);
+        return noticeHistoryDOS;
     }
 }

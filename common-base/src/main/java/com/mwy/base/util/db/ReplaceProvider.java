@@ -48,7 +48,7 @@ public class ReplaceProvider extends MapperTemplate {
         EntityColumn logicDeleteColumn = SqlHelper.getLogicDeleteColumn(entityClass);
         processKey(sql, entityClass, ms, columnList);
         sql.append(insertIntoTable(entityClass, tableName(entityClass)));
-        sql.append(SqlHelper.insertColumns(entityClass, false, false, false));
+        sql.append(SqlHelper.insertColumns(entityClass, false, true, false));
         sql.append("<trim prefix=\"VALUES(\" suffix=\")\" suffixOverrides=\",\">");
         for (EntityColumn column : columnList) {
             if (!column.isInsertable()) {
@@ -66,13 +66,13 @@ public class ReplaceProvider extends MapperTemplate {
                 //其他情况值仍然存在原property中
                 sql.append(SqlHelper.getIfNotNull(column, column.getColumnHolder(null, null, ","), isNotEmpty()));
             }
-            //当属性为null时，如果存在主键策略，会自动获取值，如果不存在，则使用null
-            if (column.isIdentity()) {
-                sql.append(SqlHelper.getIfCacheIsNull(column, column.getColumnHolder() + ","));
-            } else {
-                //当null的时候，如果不指定jdbcType，oracle可能会报异常，指定VARCHAR不影响其他
-                sql.append(SqlHelper.getIfIsNull(column, column.getColumnHolder(null, null, ","), isNotEmpty()));
-            }
+//            //当属性为null时，如果存在主键策略，会自动获取值，如果不存在，则使用null
+//            if (column.isIdentity()) {
+//                sql.append(SqlHelper.getIfCacheIsNull(column, column.getColumnHolder() + ","));
+//            } else {
+//                //当null的时候，如果不指定jdbcType，oracle可能会报异常，指定VARCHAR不影响其他
+//                sql.append(SqlHelper.getIfIsNull(column, column.getColumnHolder(null, null, ","), isNotEmpty()));
+//            }
         }
         sql.append("</trim>");
         return sql.toString();

@@ -52,4 +52,8 @@ public class DateUtils {
     public static String nowStr() {
         return date2String(new Date(), "yyyy-MM-dd HH:mm:ss");
     }
+
+    public static String nowDayStr() {
+        return date2String(new Date(), "yyyy-MM-dd");
+    }
 }

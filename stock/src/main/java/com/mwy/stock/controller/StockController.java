@@ -6,6 +6,7 @@ import com.mwy.stock.modal.dto.DataBoardDTO;
 import com.mwy.stock.modal.qry.FavoriteEditParam;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
+import com.mwy.stock.reponstory.dao.modal.StockNoticeHistoryDO;
 import com.mwy.stock.service.StockService;
 import com.mwy.stock.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -104,5 +105,11 @@ public class StockController {
     public Result stopWatch(Boolean stopWatch){
         SwitchConfig.stopWatch = stopWatch;
         return Result.ofSuccess(SwitchConfig.stopWatch);
+    }
+
+    @GetMapping("/getNoticeList")
+    public Result getNoticeList(String day){
+        List<StockNoticeHistoryDO> stockNoticeHistoryDOS = stockService.queryNoticeList(day);
+        return Result.ofSuccess(stockNoticeHistoryDOS);
     }
 }
