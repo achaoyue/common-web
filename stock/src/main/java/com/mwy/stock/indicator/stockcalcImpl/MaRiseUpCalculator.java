@@ -58,7 +58,7 @@ public class MaRiseUpCalculator implements StockCalculator {
 
         if (allUp){
             stockScoreDTO.setScore((stockDayInfos.get(0).getTurnOverrate()*100));
-            stockScoreDTO.setScoreDesc("");
+            stockScoreDTO.setScoreDesc("x");
         }else {
 
             return null;

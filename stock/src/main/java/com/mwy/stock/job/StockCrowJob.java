@@ -22,7 +22,7 @@ public class StockCrowJob {
         log.info("股票抓取正常结束");
     }
 
-    @Scheduled(cron = "0 1 13 * * ?")
+    @Scheduled(cron = "0 40 14 * * ?")
     public void startCrowStock2() {
         log.info("开始抓取股票13点");
         stockService.crowStock();

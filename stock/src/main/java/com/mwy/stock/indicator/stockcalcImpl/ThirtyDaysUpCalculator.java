@@ -70,7 +70,7 @@ public class ThirtyDaysUpCalculator implements StockCalculator {
                 && stockDayInfos.get(0).getClose() > maxClose3
                 && stockDayInfos.get(1).getClose() < maxClose2){
             stockScoreDTO.setScore((stockDayInfos.get(0).getTurnOverrate()*100));
-            stockScoreDTO.setScoreDesc("");
+            stockScoreDTO.setScoreDesc("X");
         }else {
             log.info("diff:{},maxClose:{},minClose:{}",maxClose1,maxClose2);
             return null;

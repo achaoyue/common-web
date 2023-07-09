@@ -5,8 +5,10 @@ import com.mwy.stock.indicator.StockCalculator;
 import com.mwy.stock.modal.dto.StockScoreDTO;
 import com.mwy.stock.reponstory.dao.StockDao;
 import com.mwy.stock.reponstory.dao.StockDayInfoDao;
+import com.mwy.stock.reponstory.dao.StockNoticeHistoryDao;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
+import com.mwy.stock.reponstory.dao.modal.StockNoticeHistoryDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,8 @@ public class IndicatorCalculator2 implements StockCalculator {
     private StockDayInfoDao stockDayInfoDao;
     @Resource
     private StockDao stockDao;
+    @Resource
+    private StockNoticeHistoryDao stockNoticeHistoryDao;
 
     @Override
     public StockScoreDTO calc(String stockNum, String date) {
@@ -102,6 +106,13 @@ public class IndicatorCalculator2 implements StockCalculator {
             sb.append("k线上穿-100+"+kUpHigh100+";");
         }
 
+        //有通知
+        StockNoticeHistoryDO noticeHistoryDO = stockNoticeHistoryDao.getByStockNum(stockNum, date);
+        int notice = 4;
+        if (noticeHistoryDO != null){
+            height += notice;
+            sb.append("今日有通知+"+notice+";");
+        }
 
 
         stockScoreDTO.setScore(height);

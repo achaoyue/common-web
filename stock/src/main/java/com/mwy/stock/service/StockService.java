@@ -87,6 +87,7 @@ public class StockService {
 
         List<EasyMoneyStockDTO> stockDTOList = easyMoneyRepository.getStockListByScript();
 
+        //更新股票
         List<StockDO> updateStockDos = stockDTOList.stream()
                 .map(e -> StockConvertor.toDO(e))
                 .filter(e -> stockDOMap.containsKey(e.getStockNum()))
@@ -97,6 +98,7 @@ public class StockService {
             stockDao.updateByIdSelective(stockDO);
         }
 
+        //新增股票
         List<StockDO> insertStockDOs = stockDTOList.stream()
                 .map(e -> StockConvertor.toDO(e))
                 .filter(e -> !stockDOMap.containsKey(e.getStockNum()))
@@ -241,18 +243,18 @@ public class StockService {
         return list;
     }
 
-    public DataBoardDTO queryDataBoard() {
+    public DataBoardDTO queryDataBoard(String date) {
         //涨跌数量
-        UpDownSize upDownSize = stockDao.queryUpDownSize();
+        UpDownSize upDownSize = stockDao.queryUpDownSize(date);
         //各行业涨跌情况
-        List<UpDownSize> upDownSizes = stockDao.queryUpDownSizeByIndustry();
+        List<UpDownSize> upDownSizes = stockDao.queryUpDownSizeByIndustry(date);
         //各行业龙头
-        List<StockDO> stockDOS = stockDao.queryTopByIndustry();
+        List<StockDO> stockDOS = stockDao.queryTopByIndustry(date);
         Map<String, StockDO> topIndustryMap = stockDOS.stream()
                 .collect(Collectors.toMap(e -> e.getIndustry(), e -> e,(e1,e2)->e1));
 
-        List<StockDO> upTopList = stockDao.queryUpTop(100);
-        List<StockDO> downTopList = stockDao.queryDownTop(100);
+        List<StockDO> upTopList = stockDao.queryUpTop(100,date);
+        List<StockDO> downTopList = stockDao.queryDownTop(100,date);
 
         DataBoardDTO boardDTO = new DataBoardDTO();
         boardDTO.setUpSize(upDownSize.getUpSize());
@@ -266,8 +268,8 @@ public class StockService {
         return boardDTO;
     }
 
-    public List<UpDownSize> queryUpDownSizeByIndustry() {
-        return stockDao.queryUpDownSizeByIndustry();
+    public List<UpDownSize> queryUpDownSizeByIndustry(String date) {
+        return stockDao.queryUpDownSizeByIndustry(date);
     }
 
     public void editFavorite(FavoriteEditParam favoriteEditParam) {
@@ -365,7 +367,7 @@ public class StockService {
         List<List<StockNoticeHistoryDO>> partitions = Lists.partition(historyDOList, 20);
         for (List<StockNoticeHistoryDO> partition : partitions) {
             String noticeAllMsg = partition.stream().map(e -> StockNoticeHistoryAttribute.fromJson(e.getAttribute()))
-                    .map(e -> e.getNoticeMsg())
+                    .map(e -> e.isGoodTrend() ? e.getNoticeMsg()+"**" : e.getNoticeMsg())
                     .collect(Collectors.joining("\n--------\n"));
             boolean atAll = partition.stream().map(e -> StockNoticeHistoryAttribute.fromJson(e.getAttribute()))
                     .anyMatch(e -> e.isGoodTrend());

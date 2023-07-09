@@ -3,6 +3,7 @@ package com.mwy.stock.reponstory.mapper;
 import com.mwy.base.util.db.MyBaseMapper;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
 import com.mwy.stock.reponstory.dao.modal.UpDownSize;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,9 +15,13 @@ public interface StockMapper extends MyBaseMapper<StockDO> {
 
     List<String> selectIndustry();
 
-    UpDownSize queryUpDownSize();
+    UpDownSize queryUpDownSize(@Param("date") String date);
 
-    List<UpDownSize> queryUpDownSizeByIndustry();
+    List<UpDownSize> queryUpDownSizeByIndustry(@Param("date") String date);
 
-    List<StockDO> queryTopByIndustry();
+    List<StockDO> queryTopByIndustry(@Param("date") String date);
+
+    List<StockDO> queryUpTop(@Param("date") String date, @Param("size") int size);
+
+    List<StockDO> queryDownTop(@Param("date") String date, @Param("size") int size);
 }

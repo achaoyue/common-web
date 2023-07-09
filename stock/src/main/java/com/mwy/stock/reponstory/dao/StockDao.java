@@ -15,7 +15,6 @@ import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.weekend.WeekendSqls;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,32 +66,23 @@ public class StockDao extends BaseDao<StockDO,StockMapper> implements Initializi
     public List<String> selectIndustry() {
         return stockMapper.selectIndustry();
     }
-    public UpDownSize queryUpDownSize(){
-        return stockMapper.queryUpDownSize();
+    public UpDownSize queryUpDownSize(String date){
+        return stockMapper.queryUpDownSize(date);
     }
 
-    public List<UpDownSize> queryUpDownSizeByIndustry(){
-        return stockMapper.queryUpDownSizeByIndustry();
+    public List<UpDownSize> queryUpDownSizeByIndustry(String date){
+        return stockMapper.queryUpDownSizeByIndustry(date);
     }
 
-    public List<StockDO> queryTopByIndustry() {
-        return stockMapper.queryTopByIndustry();
+    public List<StockDO> queryTopByIndustry(String date) {
+        return stockMapper.queryTopByIndustry(date);
     }
 
-    public List<StockDO> queryUpTop(int size) {
-        WeekendSqls<StockDO> sqls = WeekendSqls.custom();
-        Example example = Example.builder(StockDO.class).where(sqls).orderByDesc("upDownRange").build();
-        Page<Object> page = PageHelper.startPage(1,size,false);
-        return selectByExample(example);
+    public List<StockDO> queryUpTop(int size, String date) {
+        return stockMapper.queryUpTop(date,size);
     }
 
-    public List<StockDO> queryDownTop(int size) {
-        WeekendSqls<StockDO> sqls = WeekendSqls.custom();
-        Example example = Example.builder(StockDO.class)
-                .where(sqls)
-                .orderByAsc("upDownRange")
-                .build();
-        Page<Object> page = PageHelper.startPage(1,size,false);
-        return selectByExample(example);
+    public List<StockDO> queryDownTop(int size, String date) {
+        return stockMapper.queryDownTop(date,size);
     }
 }

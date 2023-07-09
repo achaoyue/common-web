@@ -94,7 +94,7 @@ public class BeautifulCalculator implements StockCalculator {
         }
 
         stockScoreDTO.setScore((currentDayInfo.getTurnOverrate()*100));
-        stockScoreDTO.setScoreDesc("");
+        stockScoreDTO.setScoreDesc("X");
 
         return stockScoreDTO;
     }

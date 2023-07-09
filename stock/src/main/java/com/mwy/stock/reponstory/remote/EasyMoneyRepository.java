@@ -24,6 +24,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class EasyMoneyRepository {
 
+    /**
+     * K线
+     * @param stockNum
+     * @return
+     */
     public List<EasyMoneyStockDayInfoDTO> crawlStockDayInfoListByStockBean(String stockNum) {
         String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get";
         Map<String, Object> param = new HashMap<String, Object>();
@@ -84,6 +89,11 @@ public class EasyMoneyRepository {
         return list;
     }
 
+    /**
+     * 资金流向
+     * @param stockNum
+     * @return
+     */
     public EasyMoneyStockFundDTO getStockFund(String stockNum){
         String url = "http://push2.eastmoney.com/api/qt/stock/get";
 
@@ -116,6 +126,10 @@ public class EasyMoneyRepository {
         return stockBean;
     }
 
+    /**
+     * 全量股票
+     * @return
+     */
     public List<EasyMoneyStockDTO> getStockListByScript() {
         String url = "http://19.push2.eastmoney.com/api/qt/clist/get";
 
@@ -212,6 +226,11 @@ public class EasyMoneyRepository {
         return stockBeanList;
     }
 
+    /**
+     * 分时抓取
+     * @param stockNum
+     * @return
+     */
     public List<StockTimeInfoDO> crawlStockTimeInfoList(String stockNum) {
         String url = "http://push2his.eastmoney.com/api/qt/stock/trends2/get";
         //String param = "begin=0&end=-1&select=time,price,volume";

@@ -74,14 +74,14 @@ public class StockController {
     }
 
     @GetMapping("/getDataBoard")
-    public Result getDataBoard(){
-        DataBoardDTO dataBoardDTO = stockService.queryDataBoard();
+    public Result getDataBoard(String date){
+        DataBoardDTO dataBoardDTO = stockService.queryDataBoard(date);
         return Result.ofSuccess(dataBoardDTO);
     }
 
     @GetMapping("/queryUpDownSizeByIndustry")
-    public Result queryUpDownSizeByIndustry(){
-        return Result.ofSuccess(stockService.queryUpDownSizeByIndustry());
+    public Result queryUpDownSizeByIndustry(String date){
+        return Result.ofSuccess(stockService.queryUpDownSizeByIndustry(date));
     }
 
     @PostMapping("/editFavorite")

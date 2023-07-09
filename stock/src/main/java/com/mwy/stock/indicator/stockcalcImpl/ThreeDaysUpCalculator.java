@@ -67,7 +67,7 @@ public class ThreeDaysUpCalculator implements StockCalculator {
         TrendEnum trend = trendsCalculator.trend(closeArr, 4);
         if (trend == TrendEnum.Index_Rise || trend == TrendEnum.Straight_Rise){
             stockScoreDTO.setScore((currentDayInfo.getTurnOverrate()*100));
-            stockScoreDTO.setScoreDesc("");
+            stockScoreDTO.setScoreDesc("XX");
         }else{
             return null;
         }

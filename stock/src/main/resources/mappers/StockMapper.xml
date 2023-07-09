@@ -44,22 +44,46 @@
           select distinct industry from stock;
     </select>
       <select id="queryUpDownSize" resultType="com.mwy.stock.reponstory.dao.modal.UpDownSize">
-          select COUNT(CASE WHEN up_down_range > 0 THEN 1 END) upSize,
-          COUNT(CASE WHEN 0>up_down_range THEN 1 END) downSize
+          select COUNT(CASE WHEN stock_day_info.up_down_range > 0 THEN 1 END) upSize,
+                 COUNT(CASE WHEN 0>stock_day_info.up_down_range THEN 1 END) downSize
           from stock
+            left join stock_day_info on stock.stock_num = stock_day_info.stock_num
+          where stock_day_info.date = #{date}
+
       </select>
     <select id="queryUpDownSizeByIndustry" resultType="com.mwy.stock.reponstory.dao.modal.UpDownSize">
         select * from (select industry,
-        COUNT(CASE WHEN up_down_range > 0 THEN 1 END) upSize,
-        COUNT(CASE WHEN 0 > up_down_range THEN 1 END) downSize,
+        COUNT(CASE WHEN stock_day_info.up_down_range > 0 THEN 1 END) upSize,
+        COUNT(CASE WHEN 0 > stock_day_info.up_down_range THEN 1 END) downSize,
         count(*) allSize
         from stock
+         left join stock_day_info on stock.stock_num = stock_day_info.stock_num
+        where stock_day_info.date = #{date}
         group by industry) t
         order by upSize/allSize desc
     </select>
     <select id="queryTopByIndustry" resultType="com.mwy.stock.reponstory.dao.modal.StockDO">
         select *
-        from stock a where not exists(select * from stock b where a.industry = b.industry and b.total_market_value > a.total_market_value)
+        from stock a
+        left join stock_day_info on a.stock_num = stock_day_info.stock_num
+        where not exists(select * from stock b where a.industry = b.industry and b.total_market_value > a.total_market_value)
+            and stock_day_info.date = #{date}
+    </select>
+    <select id="queryUpTop" resultType="com.mwy.stock.reponstory.dao.modal.StockDO">
+        select stock.*
+        from stock
+        left join stock_day_info on stock.stock_num = stock_day_info.stock_num
+        where stock_day_info.date = #{date}
+        order by stock_day_info.up_down_range desc
+        limit #{size}
+    </select>
+    <select id="queryDownTop" resultType="com.mwy.stock.reponstory.dao.modal.StockDO">
+        select stock.*
+        from stock
+        left join stock_day_info on stock.stock_num = stock_day_info.stock_num
+        where stock_day_info.date = #{date}
+        order by stock_day_info.up_down_range asc
+        limit #{size}
     </select>
 
 </mapper>
