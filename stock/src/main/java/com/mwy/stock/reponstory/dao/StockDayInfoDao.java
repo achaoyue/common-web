@@ -53,6 +53,18 @@ public class StockDayInfoDao extends BaseDao<StockDayInfoDO, StockDayInfoMapper>
         return stockDayInfoMapper.selectByExample(example);
     }
 
+    public List<StockDayInfoDO> selectByPeriod(List<String> stockNums, String startDate, String endDate) {
+        WeekendSqls<StockDayInfoDO> sqls = WeekendSqls.custom();
+        sqls.andIn(StockDayInfoDO::getStockNum, stockNums);
+        sqls.andLessThanOrEqualTo(StockDayInfoDO::getDate, endDate);
+        sqls.andGreaterThan(StockDayInfoDO::getDate, startDate);
+        Example example = Example.builder(StockDayInfoDO.class)
+                .where(sqls)
+                .orderByAsc("date")
+                .build();
+        return stockDayInfoMapper.selectByExample(example);
+    }
+
     public int bigThan(String date) {
         WeekendSqls<StockDayInfoDO> sqls = WeekendSqls.custom();
         sqls.andEqualTo(StockDayInfoDO::getStockNum, "600479");

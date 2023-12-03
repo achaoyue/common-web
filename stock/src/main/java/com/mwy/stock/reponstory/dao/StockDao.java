@@ -3,6 +3,7 @@ package com.mwy.stock.reponstory.dao;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.mwy.base.util.db.BaseDao;
+import com.mwy.stock.reponstory.dao.modal.IndustryUpDownDO;
 import com.mwy.stock.reponstory.dao.modal.UpDownSize;
 import com.mwy.stock.reponstory.mapper.StockMapper;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
@@ -72,6 +73,10 @@ public class StockDao extends BaseDao<StockDO,StockMapper> implements Initializi
 
     public List<UpDownSize> queryUpDownSizeByIndustry(String date){
         return stockMapper.queryUpDownSizeByIndustry(date);
+    }
+
+    public List<UpDownSize> queryUpDownSizeByIndustry(String startDate, String endDate){
+        return stockMapper.queryUpDownSizeByIndustryPeriod(startDate,endDate);
     }
 
     public List<StockDO> queryTopByIndustry(String date) {

@@ -1,5 +1,6 @@
 package com.mwy.stock.reponstory.dao;
 
+import com.mwy.stock.modal.co.CommonPair;
 import com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO;
 import com.mwy.stock.reponstory.mapper.StockTimeInfoMapper;
 import com.mwy.stock.reponstory.remote.EasyMoneyRepository;
@@ -45,6 +46,10 @@ public class StockTimeInfoDao implements InitializingBean {
 
     public double abnormal(String stockNum, List<String> dates) {
         return stockTimeInfoMapper.abnormal(stockNum, dates);
+    }
+
+    public List<CommonPair> abnormal(String stockNum, String startDate, String endDate) {
+        return stockTimeInfoMapper.abnormalPeriod(stockNum, startDate, endDate);
     }
 
     @Override

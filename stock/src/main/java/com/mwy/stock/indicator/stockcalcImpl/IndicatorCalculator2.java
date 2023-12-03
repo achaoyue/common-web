@@ -108,7 +108,7 @@ public class IndicatorCalculator2 implements StockCalculator {
 
         //有通知
         StockNoticeHistoryDO noticeHistoryDO = stockNoticeHistoryDao.getByStockNum(stockNum, date);
-        int notice = 4;
+        int notice = 1;
         if (noticeHistoryDO != null){
             height += notice;
             sb.append("今日有通知+"+notice+";");

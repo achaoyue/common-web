@@ -5,6 +5,10 @@ import lombok.Data;
 @Data
 public class UpDownSize {
     /**
+     * 日期
+     */
+    private String date;
+    /**
      * 行业
      */
     private String industry;
@@ -16,6 +20,11 @@ public class UpDownSize {
      * 下跌数量
      */
     private int downSize;
+
+    /**
+     * 涨停数量
+     */
+    private int topSize;
 
     /**
      * 全部数量

@@ -8,6 +8,10 @@ import com.mwy.base.util.db.YesOrNoEnum;
 import com.mwy.stock.config.NoticeConfig;
 import com.mwy.stock.config.SwitchConfig;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
+import com.mwy.stock.modal.co.CommonPair;
+import com.mwy.stock.modal.co.LineCO;
+import com.mwy.stock.modal.co.LinesCO;
+import com.mwy.stock.modal.co.MarkPoint;
 import com.mwy.stock.modal.converter.StockConvertor;
 import com.mwy.stock.modal.dto.DataBoardDTO;
 import com.mwy.stock.modal.dto.ProgressDTO;
@@ -23,6 +27,7 @@ import com.mwy.stock.util.DateUtils;
 import com.mwy.stock.util.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -69,6 +74,14 @@ public class StockService {
     public StockDO get(long id) {
         StockDO stockDO = stockDao.selectById(id);
         return stockDO;
+    }
+
+    public List stockList() {
+        List<StockDO> dbStockDOs = stockDao.selectAll();
+        List<CommonPair> stockList = dbStockDOs.stream()
+                .map(e -> CommonPair.of(e.getStockName(), e.getStockNum()))
+                .collect(Collectors.toList());
+        return stockList;
     }
 
     /**
@@ -259,6 +272,7 @@ public class StockService {
         DataBoardDTO boardDTO = new DataBoardDTO();
         boardDTO.setUpSize(upDownSize.getUpSize());
         boardDTO.setDownSize(upDownSize.getDownSize());
+        boardDTO.setTopSize(upDownSize.getTopSize());
         boardDTO.setIndustryUpDown(upDownSizes);
         boardDTO.setIndustryTopMap(topIndustryMap);
         boardDTO.setTopUpStockList(upTopList);
@@ -470,5 +484,181 @@ public class StockService {
         }
         List<StockNoticeHistoryDO> noticeHistoryDOS = stockNoticeHistoryDao.getAllByDay(day);
         return noticeHistoryDOS;
+    }
+
+    public LinesCO queryStockLine(String startDate, String endDate) {
+        List<UpDownSize> downSizes = stockDao.queryUpDownSizeByIndustry(startDate, endDate);
+
+        //全部日期
+        List<String> allDate = downSizes.stream()
+                .map(e -> e.getDate())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        //按照行业分组排序
+        Map<String, List<Long>> allLines = downSizes.stream()
+                .sorted(Comparator.comparing(UpDownSize::getDate))
+                .collect(Collectors.groupingBy(e -> e.getIndustry(), Collectors.mapping(e -> e.getUpSize() * 100L/ e.getAllSize() , Collectors.toList())));
+        List<LineCO> lines = toLines(allLines);
+
+
+
+
+        LinesCO linesCO = new LinesCO();
+        linesCO.setXAxis(allDate);
+        linesCO.setSeries(lines);
+
+        return linesCO;
+    }
+
+    private List<LineCO> toLines(Map<String, List<Long>> allLines) {
+        if (MapUtils.isEmpty(allLines)){
+            return Lists.newArrayList();
+        }
+        List<LineCO> result = Lists.newArrayList();
+        for (String industry : allLines.keySet()) {
+            List points = allLines.get(industry);
+            LineCO lineCO = new LineCO();
+            lineCO.setName(industry);
+            lineCO.setData(points);
+            result.add(lineCO);
+        }
+        return result;
+    }
+
+    public LinesCO queryKLine(String industry, List<String> stockNums, String startDate, String endDate) {
+
+        if (StringUtils.isNotBlank(industry)){
+            List<StockDO> stockDos = stockDao.getByIndustry(industry);
+            stockNums = stockDos.stream()
+                    .map(e->e.getStockNum())
+                    .collect(Collectors.toList());
+        }
+
+        List<StockDayInfoDO> allStockDayInfoDOS = stockDayInfoDao.selectByPeriod(stockNums, startDate, endDate);
+
+        Map<String, List<StockDayInfoDO>> stockGroups = allStockDayInfoDOS.stream()
+                .collect(Collectors.groupingBy(e -> e.getStockNum(), Collectors.toList()));
+
+        List<String> dates = allStockDayInfoDOS.stream()
+                .map(e -> e.getDate())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+        boolean needWave = stockGroups.size() == 1;
+        LinesCO linesCO = new LinesCO();
+        linesCO.setXAxis(dates);
+        List<LineCO> lines = Lists.newArrayList();
+        for (String stockNum : stockGroups.keySet()) {
+            List<StockDayInfoDO> stockDayInfoDOS = stockGroups.get(stockNum);
+
+            List closePrices = Lists.newArrayList();
+            Map<String, Double> vmap = new HashMap<>();
+            double start = 100;
+            for (StockDayInfoDO stockDayInfoDO : stockDayInfoDOS) {
+                if (needWave){
+                    start = stockDayInfoDO.getClose();
+                }else {
+                    start = start * (1+stockDayInfoDO.getUpDownRange()/100);
+                }
+                closePrices.add(start);
+                vmap.put(stockDayInfoDO.getDate(),start);
+            }
+
+            LineCO lineCO = new LineCO();
+            lineCO.setName("收盘价"+stockNum);
+            lineCO.setData(closePrices);
+
+            List listTrends = toTrends(stockDayInfoDOS);
+            LineCO waveCO = new LineCO();
+            waveCO.setName("波浪"+stockNum);
+            waveCO.setData(listTrends);
+
+            //异动数据
+            List<CommonPair> abnormalDays = stockTimeInfoDao.abnormal(stockNum, startDate, endDate);
+            List<Map<String,Object>> list = new ArrayList<>();
+            for (CommonPair abnormal : abnormalDays) {
+                if (abnormal.getValue() == null){
+                    log.error("some error:{}",abnormal);
+                    continue;
+                }
+                double abValue = (double) abnormal.getValue();
+                if (abValue<15){
+                    continue;
+                }
+                Double v = vmap.get(abnormal.getKey());
+                Map m = new HashMap<>();
+                m.put("xAxis",abnormal.getKey());
+                m.put("yAxis",v);
+                m.put("value",(int)abValue);
+                list.add(m);
+            }
+            MarkPoint markPoint = new MarkPoint();
+            markPoint.setData(list);
+            lineCO.setMarkPoint(markPoint);
+
+            lines.add(lineCO);
+            if (needWave){
+                lines.add(waveCO);
+            }
+        }
+
+        linesCO.setSeries(lines);
+
+        return linesCO;
+    }
+
+    private List<Object[]> toTrends(List<StockDayInfoDO> stockDayInfoDOS) {
+        List result = Lists.newArrayList();
+        result.add(new Object[]{stockDayInfoDOS.get(0).getDate(),stockDayInfoDOS.get(0).getClose()});
+        double[] arr = stockDayInfoDOS.stream()
+                .mapToDouble(e -> e.getClose())
+                .toArray();
+        int step = 5;
+        for (int i = 0; i + (step-1)*2 < arr.length; i++) {
+            int maxIdx1 = max(arr, i, i + step-1);
+            int maxIdx2 = max(arr, i + step-1, i + (step-1)*2);
+            if (maxIdx1 == maxIdx2){
+                StockDayInfoDO stockDayInfoDO = stockDayInfoDOS.get(maxIdx1);
+                result.add(new Object[]{stockDayInfoDO.getDate(),stockDayInfoDO.getClose()});
+            }
+
+            int minIdx1 = min(arr, i, i + step-1);
+            int minIdx2 = min(arr, i + step-1, i + (step-1)*2);
+            if (minIdx1 == minIdx2){
+                StockDayInfoDO stockDayInfoDO = stockDayInfoDOS.get(minIdx1);
+                result.add(new Object[]{stockDayInfoDO.getDate(),stockDayInfoDO.getClose()});
+            }
+        }
+        result.add(new Object[]{stockDayInfoDOS.get(stockDayInfoDOS.size()-1).getDate(),stockDayInfoDOS.get(stockDayInfoDOS.size()-1).getClose()});
+
+        return result;
+    }
+
+    private int max(double[] arr, int start, int end) {
+        int max = start;
+        for (;start<arr.length && start<= end;start++){
+            if (arr[max] < arr[start]){
+                max = start;
+            }
+        }
+        return max;
+    }
+
+    private int min(double[] arr, int start, int end) {
+        int min = start;
+        for (;start<arr.length && start<= end;start++){
+            if (arr[min] > arr[start]){
+                min = start;
+            }
+        }
+        return min;
+    }
+
+    public List<StockDayInfoDO> queryDayLine(String stockNum, String startDate, String endDate) {
+        List<StockDayInfoDO> allStockDayInfoDOS = stockDayInfoDao.selectByPeriod(Lists.newArrayList(stockNum), startDate, endDate);
+
+        return allStockDayInfoDOS;
     }
 }

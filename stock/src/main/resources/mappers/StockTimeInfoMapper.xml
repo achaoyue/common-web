@@ -39,6 +39,13 @@
     <select id="maxDate" resultType="java.lang.String">
         select max(date) from stock_time_info_${stockNum}
     </select>
+    <select id="abnormalPeriod" resultType="com.mwy.stock.modal.co.CommonPair">
+        select date as `key`,max(volume)/avg(volume) as `value` from  stock_time_info_${stockNum}
+        where stock_num = #{stockNum}
+        and date >= #{startDate}
+        and #{endDate} >= date
+        group by date
+    </select>
 
     <insert id="insertByTable">
         insert into  stock_time_info_${stockNum} (

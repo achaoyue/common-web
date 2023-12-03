@@ -24,4 +24,7 @@ public interface StockMapper extends MyBaseMapper<StockDO> {
     List<StockDO> queryUpTop(@Param("date") String date, @Param("size") int size);
 
     List<StockDO> queryDownTop(@Param("date") String date, @Param("size") int size);
+
+    List<UpDownSize> queryUpDownSizeByIndustryPeriod(@Param("startDate") String startDate,
+                                                     @Param("endDate") String endDate);
 }

@@ -17,6 +17,12 @@ public class DataBoardDTO {
      * 下跌数量
      */
     private int downSize;
+
+    /**
+     * 涨停数量
+     */
+    private int topSize;
+
     /**
      * 各行业涨跌数据
      */

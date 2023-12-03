@@ -45,7 +45,8 @@
     </select>
       <select id="queryUpDownSize" resultType="com.mwy.stock.reponstory.dao.modal.UpDownSize">
           select COUNT(CASE WHEN stock_day_info.up_down_range > 0 THEN 1 END) upSize,
-                 COUNT(CASE WHEN 0>stock_day_info.up_down_range THEN 1 END) downSize
+                 COUNT(CASE WHEN 0>stock_day_info.up_down_range THEN 1 END) downSize,
+                 COUNT(CASE WHEN stock_day_info.up_down_range > 9 THEN 1 END) topSize
           from stock
             left join stock_day_info on stock.stock_num = stock_day_info.stock_num
           where stock_day_info.date = #{date}
@@ -55,12 +56,13 @@
         select * from (select industry,
         COUNT(CASE WHEN stock_day_info.up_down_range > 0 THEN 1 END) upSize,
         COUNT(CASE WHEN 0 > stock_day_info.up_down_range THEN 1 END) downSize,
+        COUNT(CASE WHEN stock_day_info.up_down_range > 9 THEN 1 END) topSize,
         count(*) allSize
         from stock
          left join stock_day_info on stock.stock_num = stock_day_info.stock_num
         where stock_day_info.date = #{date}
         group by industry) t
-        order by upSize/allSize desc
+        order by topSize desc,upSize/allSize desc
     </select>
     <select id="queryTopByIndustry" resultType="com.mwy.stock.reponstory.dao.modal.StockDO">
         select *
@@ -84,6 +86,18 @@
         where stock_day_info.date = #{date}
         order by stock_day_info.up_down_range asc
         limit #{size}
+    </select>
+    <select id="queryUpDownSizeByIndustryPeriod" resultType="com.mwy.stock.reponstory.dao.modal.UpDownSize">
+        select date,
+            industry,
+            COUNT(CASE WHEN stock_day_info.up_down_range > 0 THEN 1 END) upSize,
+            COUNT(CASE WHEN 0 > stock_day_info.up_down_range THEN 1 END) downSize,
+            COUNT(CASE WHEN stock_day_info.up_down_range > 9 THEN 1 END) topSize,
+            count(*) allSize
+        from stock_day_info
+            left join stock on stock.stock_num = stock_day_info.stock_num
+        where stock_day_info.date > #{startDate} and #{endDate} > stock_day_info.date
+        group by date, industry
     </select>
 
 </mapper>
