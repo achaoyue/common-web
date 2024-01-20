@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style type="text/css">
+
+        .custom-tree-node {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            padding-right: 8px;
+        }
+        .treeItemOp:hover{
+            color: #5bb6ff;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1>可视化页面编辑器</h1>
+    <el-row>
+        <el-col :span="6">
+            <div class="grid-content bg-purple">
+                <el-tree
+                        :data="treeTag"
+                        node-key="id"
+                        :expand-on-click-node="false"
+                        @node-click="handleNodeClick"
+                        default-expand-all>
+                    <span class="custom-tree-node" slot-scope="{ node, data }">
+                        <span>{{ data.name || data.tag }}</span>
+                        <span>
+                            <i class="el-icon-circle-plus treeItemOp" @click="() => append(data)" ></i>
+                            <i class="el-icon-remove treeItemOp" @click="() => remove(node, data)"></i>
+                        </span>
+                    </span>
+                </el-tree>
+            </div>
+        </el-col>
+        <el-col :span="15">
+            <div class="grid-content bg-purple-light">
+                <el-Button @click="refreshOut">刷新</el-Button>
+                <my-cc :message="helloMessage"></my-cc>
+            </div>
+        </el-col>
+        <el-col :span="3">
+            <div class="grid-content bg-purple">
+                name:<el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
+                tag:<el-select v-model="editNode.tag" placeholder="请选择">
+                        <el-option
+                                v-for="item of allEnableTag"
+                                :key="item.tag"
+                                :label="item.tag"
+                                :value="item.tag">
+                        </el-option>
+                    </el-select>
+                content:<el-input v-model="editNode.content"></el-input>
+                <hr/>
+                <div v-for="item in allEnableTag[editNode.tag] ? allEnableTag[editNode.tag].props : []">
+                    <span>{{item.name}}</span>
+                    <span>{{item.key}}</span>
+                    <el-input v-model="editNode.attr[item.key]"></el-input>
+                </div>
+            </div>
+        </el-col>
+    </el-row>
+</div>
+</body>
+<!-- import Vue before Element -->
+<!--<script src="https://unpkg.com/vue@2/dist/vue.js"></script>-->
+<script src="./js/vue2.0.js"></script>
+<!-- import JavaScript -->
+<!--<script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+<script src="./js/element.js"></script>
+<script src="./js/test.js" ></script>
+<script>
+    let id = 1000;
+    Vue.component("my-cc", {
+        data:function (){
+            return {
+                name:'mwy'
+            }
+        },
+        props: ['message'],
+        render:function (createElement){
+            return createElement({
+                template: this.message
+            })
+        },
+        methods: {
+            cc() {
+                alert("cc")
+            },
+
+        }
+    })
+
+
+    vue = new Vue({
+        el: '#app',
+
+        data: function () {
+            return {
+                visible: false,
+                helloMessage: '<div>Hello from MyComponent!</div>',
+                treeTag: JSON.parse(localStorage.getItem("treeTagData")) || [{
+                    id:1000,
+                    name: "根节点",
+                    tag:"div",
+                    children: [],
+                }],
+                editNode: {},
+                allEnableTag:allTags
+            }
+        },
+        mounted(){
+            function findMaxId(r){
+                for (let item of r) {
+                    if (item.id > id){
+                        id = item.id;
+                        console.log("fixMaxId:"+id)
+                    }
+                    if (item.children){
+                        findMaxId(item.children)
+                    }
+                }
+            }
+            findMaxId(this.treeTag);
+        },
+        methods: {
+            refreshOut(){
+                treeRoot = JSON.parse(JSON.stringify(this.treeTag[0]));
+                let t =  buildTree(treeRoot);
+                console.log(t);
+                this.helloMessage = t;
+                localStorage.setItem("treeTagData",JSON.stringify(this.treeTag))
+            },
+            append(data) {
+                const newChild = {id: ++id, tag: 'div', children: [], attr:{}};
+                if (!data.children) {
+                    this.$set(data, 'children', []);
+                }
+                data.children.push(newChild);
+            },
+            remove(node, data) {
+                if (!this.treeTag || (this.treeTag.length == 1 && this.treeTag[0] == data)){
+                    alert("根节点必须有一个")
+                    return;
+                }
+                const parent = node.parent;
+                const children = parent.data.children || parent.data;
+                const index = children.findIndex(d => d.id === data.id);
+                children.splice(index, 1);
+            },
+            handleNodeClick(data){
+                this.editNode = data;
+                console.log(data)
+            }
+        }
+    })
+
+    treeRoot = {
+        name: "div",
+        children: []
+    }
+
+    treeRoot.children.push({
+        name: "el-Button",
+        children: [{name: 'txt', content: "xxx"}]
+    })
+
+    function buildTree(root) {
+        l = "";
+        if (root.tag == 'txt') {
+            l += `${root.content}`
+        }else if (root.tag == 'el-input') {
+            l += `<${root.tag}/>`
+        } else {
+            let attr = " ";
+            if (root.attr){
+                for (let item in root.attr) {
+                    attr += item + "="+ root.attr[item]+" ";
+                }
+            }
+            l += `<${root.tag} ${attr}>`
+            if (root.children) {
+                for (let i = 0; i < root.children.length; i++) {
+                    l += buildTree(root.children[i])
+                }
+            }
+            l += `</${root.tag}>`
+        }
+        return l;
+    }
+
+
+</script>
+</html>
