@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <!-- import CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.14/theme-chalk/index.min.css" rel="stylesheet">
     <style type="text/css">
 
         .custom-tree-node {
@@ -44,7 +45,8 @@
         <el-col :span="15">
             <div class="grid-content bg-purple-light">
                 <el-Button @click="refreshOut">刷新</el-Button>
-                <my-cc :message="helloMessage"></my-cc>
+<!--                <my-cc :message="helloMessage"></my-cc>-->
+                <component v-bind:is="latestComponentVersion" :message="helloMessage"></component>
             </div>
         </el-col>
         <el-col :span="3">
@@ -79,25 +81,35 @@
 <script src="./js/test.js" ></script>
 <script>
     let id = 1000;
-    Vue.component("my-cc", {
-        data:function (){
+    let globalCom = {
+        data: function (){
             return {
-                name:'mwy'
+                name: 'mwy',
+                array:[1,2,3,4]
             }
         },
         props: ['message'],
-        render:function (createElement){
-            return createElement({
-                template: this.message
-            })
-        },
+        template:"<div v-on:click='ccA'>{{message}} cc</div>",
+        // render: function (createElement) {
+        //     return createElement({
+        //         template: this.message
+        //     })
+        // },
         methods: {
-            cc() {
+            ccA () {
                 alert("cc")
+                console.log(this)
             },
+            sendMsg(){
+                alert("sendMsg");
+                this.array.push(++id);
+            }
 
         }
-    })
+    }
+    let copyGlobal = JSON.parse(JSON.stringify(globalCom));
+    copyGlobal.methods = globalCom.methods;
+    Vue.component("my-cc", copyGlobal)
 
 
     vue = new Vue({
@@ -105,8 +117,9 @@
 
         data: function () {
             return {
+                latestComponentVersion:"my-cc",
                 visible: false,
-                helloMessage: '<div>Hello from MyComponent!</div>',
+                helloMessage: '<div >Hello from MyComponent!</div>',
                 treeTag: JSON.parse(localStorage.getItem("treeTagData")) || [{
                     id:1000,
                     name: "根节点",
@@ -135,8 +148,19 @@
             refreshOut(){
                 treeRoot = JSON.parse(JSON.stringify(this.treeTag[0]));
                 let t =  buildTree(treeRoot);
-                console.log(t);
-                this.helloMessage = t;
+                let copyGlobal = JSON.parse(JSON.stringify(globalCom));
+                copyGlobal.data = globalCom.data;
+                copyGlobal.methods = globalCom.methods;
+                copyGlobal.template = t;
+                console.log(copyGlobal)
+                console.log(copyGlobal.template)
+                let cv = "my-cc"+(++id);
+                Vue.component(cv, copyGlobal)
+                this.helloMessage = ++id;
+                this.latestComponentVersion = cv;
+
+
+
                 localStorage.setItem("treeTagData",JSON.stringify(this.treeTag))
             },
             append(data) {
@@ -159,8 +183,12 @@
             handleNodeClick(data){
                 this.editNode = data;
                 console.log(data)
+            },
+            incrementTotal: function () {
+                this.total += 1
+                console.log(this.total)
             }
-        }
+        },
     })
 
     treeRoot = {
@@ -178,7 +206,13 @@
         if (root.tag == 'txt') {
             l += `${root.content}`
         }else if (root.tag == 'el-input') {
-            l += `<${root.tag}/>`
+            let attr = " ";
+            if (root.attr){
+                for (let item in root.attr) {
+                    attr += item + "="+ root.attr[item]+" ";
+                }
+            }
+            l += `<${root.tag} ${attr}/>`
         } else {
             let attr = " ";
             if (root.attr){

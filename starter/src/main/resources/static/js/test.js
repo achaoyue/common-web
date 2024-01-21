@@ -8,6 +8,15 @@ allTags = {
             },
         ]
     },
+    "div":{
+        tag:"div",
+        props:[
+            {
+                name:"循环",
+                key:"v-for"
+            },
+        ]
+    },
     "el-col":{
         tag:"el-col",
         props:[
@@ -31,6 +40,10 @@ allTags = {
             {
                 name:"是否可清空",
                 key:":clearable"
+            },
+            {
+                name:"绑定元素",
+                key:"v-model"
             },
         ]
     },
