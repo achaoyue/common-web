@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.14/theme-chalk/index.min.css" rel="stylesheet">
+    <style type="text/css">
+        .myBorder:hover{
+            border:1px solid red;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1>可视化页面编辑器</h1>
+    <my-cc :items="globalCom"></my-cc>
+</div>
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.min.js"></script>
+<script src="./js/vue2.0.js"></script>
+<script src="./js/element.js"></script>
+<script src="./js/test.js" ></script>
+<script src="./js/commonweb.js" ></script>
+<script src="./js/2.vue-editor.js" ></script>
+<script src="./js/64.vue-editor.js" ></script>
+<script src="./js/vue-editor.js" ></script>
+<script>
+
+    Array.prototype.remove = function(b) {
+        var a = this.indexOf(b);
+        if (a >= 0) {
+            this.splice(a, 1);
+            return true;
+        }
+        return false;
+    };
+    NetUtils = {};
+    NetUtils.get = function (url,param){
+        return axios.get(url,{params:param}).then(resp=>resp.data)
+    }
+    NetUtils.post = function (url,param){
+        return axios.post(url,param).then(resp=>resp.data)
+    }
+
+    let id = 1000;
+    //全局数据
+    let GlobalData = {
+
+    }
+    //页面组件树
+    let globalCom = [
+        {
+            tag:'el-button',
+            children:[
+                {
+                    tag:'txt',
+                    txt:"this is test txt"
+                }
+            ]
+        },
+        {
+            tag:'el-button',
+            children:[
+                {
+                    tag:'txt',
+                    txt:"this is test txt"
+                }
+            ]
+        },
+        {
+            tag:'p',
+            children:[
+                {
+                    tag:'txt',
+                    txt:"this is test txt"
+                },
+                {
+                    tag:'span',
+                    children:[
+                        {
+                            tag:'txt',
+                            txt:"span"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+
+    Vue.component("my-cc", {
+        data: function (){
+            return {}
+        },
+        props: ['items'],
+        template:"<div class='myBorder'><template v-for='item in items'><component :is='item.tag' v-if='item.tag != \"txt\"'><my-cc v-if='item.children' :items='item.children'></my-cc></component><template v-if='item.tag == \"txt\"'>{{item.txt}}</template></template></div>",
+        methods: {
+
+        }
+    })
+
+    vue = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                globalCom:globalCom
+            }
+        },
+
+        methods: {
+
+        },
+    })
+
+
+</script>
+</html>

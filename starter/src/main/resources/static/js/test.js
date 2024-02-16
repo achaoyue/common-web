@@ -15,6 +15,10 @@ allTags = {
                 name:"循环",
                 key:"v-for"
             },
+            {
+                name:"事件",
+                key:"@click"
+            },
         ]
     },
     "el-col":{
@@ -32,6 +36,7 @@ allTags = {
     },
     "el-input":{
         tag:"el-input",
+        selfTag:true,
         props:[
             {
                 name:"输入框占位文本",
@@ -49,7 +54,6 @@ allTags = {
     },
     "el-button":{
         tag:"el-button",
-        hasChild:true,
         props:[
             {
                 name:"尺寸",
@@ -65,9 +69,101 @@ allTags = {
             },
         ]
     },
+    "el-image":{
+      tag:"el-image",
+      props:[
+          {
+              name:"路径",
+              key:":src"
+          },
+          {
+              name:"样式",
+              key:"style"
+          },
+          {
+              name:"大图",
+              key:":preview-src-list"
+          },
+      ]
+    },
+    "el-dialog":{
+      tag:"el-dialog",
+      props:[
+          {
+              name:"标题",
+              key:"title"
+          },
+          {
+              name:"是否展示变量",
+              key:":visible.sync"
+          }
+
+      ]
+    },
+    "el-table":{
+      tag:"el-table",
+      props:[
+          {
+              name:"数据",
+              key:":data"
+          }
+      ]
+    },
+    "el-table-column":{
+      tag:"el-table-column",
+      props:[
+          {
+              name:"列数据",
+              key:"prop"
+          },
+          {
+              name:"列名称",
+              key:"label"
+          }
+      ]
+    },
+    "el-date-picker":{
+      tag:"el-date-picker",
+      props:[
+          {
+              name:"变量",
+              key:"v-model"
+          },
+          {
+              name:"类型",
+              key:"type"
+          },
+          {
+              name:"提示",
+              key:"placeholder"
+          },
+          {
+              name:"格式化",
+              key:"value-format"
+          }
+      ]
+    },
+    "img":{
+        tag:"img",
+        props:[
+            {
+                name:"路径",
+                key:"src"
+            },
+            {
+                name:"样式",
+                key:"style"
+            },
+        ]
+    },
+    "span":{
+        tag:"span",
+        props:[
+
+        ]
+    },
     "文本":{
         tag:"txt",
-        hasChild:false,
         props:[
 
         ]
