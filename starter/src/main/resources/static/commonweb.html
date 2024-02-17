@@ -47,7 +47,8 @@
 <div id="app">
     <el-container>
         <el-header style="position: fixed;height: 60px;width: 100%; background-color: #3a8ee6">
-            <h3>可视化页面编辑器</h3>
+            <span style="font-size: 20px;font-weight: bold;line-height: 60px">可视化页面编辑器</span>
+            <el-button icon="el-icon-success" type="success" style="float: right;margin-top: 9px" @click="saveData">保存</el-button>
         </el-header>
         <el-container style="padding-top: 60px">
             <el-aside width="250px">
@@ -126,8 +127,8 @@
             </el-main>
             <el-aside width="250px">
                 <div class="grid-content bg-purple" v-if="editNode != null && editNode.tag">
-                    name:<el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
-                    tag:
+                    节点名称:<el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
+                    节点标签:
                     <el-select v-model="editNode.tag" placeholder="请选择">
                         <el-option
                             v-for="item of allEnableTag"
@@ -136,20 +137,27 @@
                             :value="item.tag">
                         </el-option>
                     </el-select>
-                    content:<el-input v-model="editNode.content"></el-input>
-                    <el-divider content-position="left">vue属性</el-divider>
-                    <span>v-for</span>
-                    <el-input v-model="editNode.attr['v-for']"></el-input>
-                    <span>v-if</span>
-                    <el-input v-model="editNode.attr['v-if']"></el-input>
-                    <span>@click</span>
-                    <el-input v-model="editNode.attr['@click']"></el-input>
-                    <el-divider content-position="left">标签属性</el-divider>
-                    <div v-for="item in (allEnableTag[editNode.tag] ? allEnableTag[editNode.tag].props : [])">
-                        <span>{{item.name}}</span>
-                        <span>{{item.key}}</span>
-                        <el-input v-model="editNode.attr[item.key]"></el-input>
-                    </div>
+                    <template v-if="editNode.tag=='txt'">
+                        <div>文本内容:<el-input v-model="editNode.content"></el-input></div>
+                    </template>
+                    <template v-if="editNode.tag!='txt'">
+                        <el-divider content-position="left">vue属性</el-divider>
+                        <span>style</span>
+                        <el-input v-model="editNode.attr['style']"></el-input>
+                        <span>v-for</span>
+                        <el-input v-model="editNode.attr['v-for']"></el-input>
+                        <span>v-if</span>
+                        <el-input v-model="editNode.attr['v-if']"></el-input>
+                        <span>@click</span>
+                        <el-input v-model="editNode.attr['@click']"></el-input>
+
+                        <el-divider content-position="left">标签属性</el-divider>
+                        <div v-for="item in (allEnableTag[editNode.tag] ? allEnableTag[editNode.tag].props : [])">
+                            <span>{{item.name}}</span>
+                            <span>{{item.key}}</span>
+                            <el-input v-model="editNode.attr[item.key]"></el-input>
+                        </div>
+                    </template>
                 </div>
             </el-aside>
         </el-container>

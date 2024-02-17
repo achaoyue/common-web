@@ -2,14 +2,7 @@ allTags = {
     "div": {
         tag: "div",
         props: [
-            {
-                name: "循环",
-                key: "v-for"
-            },
-            {
-                name: "事件",
-                key: "@click"
-            },
+
         ]
     },
     "img": {
@@ -18,11 +11,7 @@ allTags = {
             {
                 name: "路径",
                 key: "src"
-            },
-            {
-                name: "样式",
-                key: "style"
-            },
+            }
         ]
     },
     "span": {
