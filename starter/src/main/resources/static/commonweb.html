@@ -6,6 +6,19 @@
 <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
     <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.14/theme-chalk/index.min.css" rel="stylesheet">
     <style type="text/css">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        #app,.box{
+            height: 100%;
+        }
+        .el-container {
+            height: 100%;
+        }
+
 
         .custom-tree-node {
             flex: 1;
@@ -18,97 +31,129 @@
         .treeItemOp:hover{
             color: #5bb6ff;
         }
-        .editor-container>div:first-child{
+        .myEditor{
             height: 500px;
-        }
-        .beforeI{
-            display:block;
-            height: 10px;
-            background-color: red;
         }
         .redBoard{
             border: 1px solid red;
+        }
+        .el-tree {
+            display: inline-block;
+            min-width: 100%;
         }
     </style>
 </head>
 <body>
 <div id="app">
-    <h1>可视化页面编辑器</h1>
-    <el-row>
-        <el-col :span="6">
-            <el-tabs value="脚本">
-                <el-tab-pane label="标签树" name="first">
-                    <div class="grid-content bg-purple">
-                        <el-tree
-                                :data="treeTag"
-                                node-key="id"
-                                draggable
-                                @node-drag-end="handleDragEnd"
-                                :expand-on-click-node="false"
-                                @node-click="handleNodeClick"
-                                default-expand-all>
-                    <span class="custom-tree-node" slot-scope="{ node, data }">
-                        <span :class="data.id==editNode.id ? 'redBoard' : ''">{{ data.name || data.tag }}</span>
-                        <span>
-                            <i class="el-icon-circle-plus treeItemOp" @click="() => append(data)" ></i>
-                            <i class="el-icon-remove treeItemOp" @click="() => remove(node, data)"></i>
-                        </span>
-                    </span>
-                        </el-tree>
-                    </div>
-                </el-tab-pane>
-                <el-tab-pane label="数据源" name="second">
-                    <span>数据源</span>
-                    <div class="editor-container">
-                        <monaco-editor
-                                v-model="datajson"
-                                language="javascript"
-
-                        ></monaco-editor>
-                        <el-Button @click="codeFinish">编码完成</el-Button>
-                    </div>
-                </el-tab-pane>
-                <el-tab-pane label="脚本" name="脚本">
-                    <div class="editor-container" @click="showSize()" >
-                        <monaco-editor
-                                v-model="code"
-                                language="javascript"
-                                :options="editorOptions"
-                        ></monaco-editor>
-                        <el-Button @click="codeFinish">编码完成</el-Button>
-                    </div>
-
-                </el-tab-pane>
-            </el-tabs>
-        </el-col>
-        <el-col :span="15">
-            <div class="grid-content bg-purple-light">
+    <el-container>
+        <el-header style="position: fixed;height: 60px;width: 100%; background-color: #3a8ee6">
+            <h3>可视化页面编辑器</h3>
+        </el-header>
+        <el-container style="padding-top: 60px">
+            <el-aside width="250px">
+                <el-tabs v-model="actTab">
+                    <el-tab-pane label="标签树" name="first">
+                        <div style="overflow: auto;height: 100%;width: 100%">
+                            <el-tree
+                                    :data="treeTag"
+                                    node-key="id"
+                                    draggable
+                                    @node-drag-end="handleDragEnd"
+                                    :expand-on-click-node="false"
+                                    @node-click="handleNodeClick"
+                                    default-expand-all>
+                                <span class="custom-tree-node" slot-scope="{ node, data }">
+                                    <span :class="data.id==editNode.id ? 'redBoard' : ''">{{ data.name || data.tag }}</span>
+                                    <span>
+                                        <i class="el-icon-circle-plus treeItemOp" @click="() => append(data)" ></i>
+                                        <i class="el-icon-remove treeItemOp" @click="() => remove(node, data)"></i>
+                                    </span>
+                                </span>
+                            </el-tree>
+                        </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="数据源" name="second">
+                        <el-button @click="configDialogVisible = true">配置类</el-button>
+                        <el-dialog
+                                v-if="configDialogVisible"
+                                title="配置类数据"
+                                :visible.sync="configDialogVisible"
+                                width="90%"
+                                :before-close="configDialogBeforeClose">
+                            <monaco-editor
+                                    class="myEditor"
+                                    v-model="dataConfigJson"
+                                    language="javascript"
+                                    :options="editorOptions"
+                            ></monaco-editor>
+                        </el-dialog>
+                        <el-button @click="viewDialogVisible=true">视图类</el-button>
+                        <el-dialog
+                                v-if="viewDialogVisible"
+                                title="视图类数据"
+                                :visible.sync="viewDialogVisible"
+                                width="90%"
+                                :before-close="viewDialogBeforeClose">
+                            <div>视图数据编辑无效</div>
+                            <monaco-editor
+                                    class="myEditor"
+                                    v-model="viewConfigJson"
+                                    language="javascript"
+                                    :options="editorOptions"
+                            ></monaco-editor>
+                        </el-dialog>
+                        <el-button @click="scriptDialogVisible=true">视图类</el-button>
+                        <el-dialog
+                                v-if="scriptDialogVisible"
+                                title="视图类数据"
+                                :visible.sync="scriptDialogVisible"
+                                width="90%"
+                                :before-close="codeFinish">
+                            <monaco-editor
+                                    class="myEditor"
+                                    v-model="code"
+                                    language="javascript"
+                                    :options="editorOptions"
+                            ></monaco-editor>
+                        </el-dialog>
+                    </el-tab-pane>
+                </el-tabs>
+            </el-aside>
+            <el-main>
                 <el-Button @click="refreshOut">刷新</el-Button>
-<!--                <my-cc :message="helloMessage"></my-cc>-->
+                <!--                <my-cc :message="helloMessage"></my-cc>-->
                 <component v-bind:is="latestComponentVersion" :message="helloMessage" :editnodeid="editNode.id"></component>
-            </div>
-        </el-col>
-        <el-col :span="3">
-            <div class="grid-content bg-purple" v-if="editNode.tag != ''">
-                name:<el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
-                tag:<el-select v-model="editNode.tag" placeholder="请选择">
+            </el-main>
+            <el-aside width="250px">
+                <div class="grid-content bg-purple" v-if="editNode != null && editNode.tag">
+                    name:<el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
+                    tag:
+                    <el-select v-model="editNode.tag" placeholder="请选择">
                         <el-option
-                                v-for="item of allEnableTag"
-                                :key="item.tag"
-                                :label="item.tag"
-                                :value="item.tag">
+                            v-for="item of allEnableTag"
+                            :key="item.tag"
+                            :label="item.tag"
+                            :value="item.tag">
                         </el-option>
                     </el-select>
-                content:<el-input v-model="editNode.content"></el-input>
-                <hr/>
-                <div v-for="item in (allEnableTag[editNode.tag] ? allEnableTag[editNode.tag].props : [])">
-                    <span>{{item.name}}</span>
-                    <span>{{item.key}}</span>
-                    <el-input v-model="editNode.attr[item.key]"></el-input>
+                    content:<el-input v-model="editNode.content"></el-input>
+                    <el-divider content-position="left">vue属性</el-divider>
+                    <span>v-for</span>
+                    <el-input v-model="editNode.attr['v-for']"></el-input>
+                    <span>v-if</span>
+                    <el-input v-model="editNode.attr['v-if']"></el-input>
+                    <span>@click</span>
+                    <el-input v-model="editNode.attr['@click']"></el-input>
+                    <el-divider content-position="left">标签属性</el-divider>
+                    <div v-for="item in (allEnableTag[editNode.tag] ? allEnableTag[editNode.tag].props : [])">
+                        <span>{{item.name}}</span>
+                        <span>{{item.key}}</span>
+                        <el-input v-model="editNode.attr[item.key]"></el-input>
+                    </div>
                 </div>
-            </div>
-        </el-col>
-    </el-row>
+            </el-aside>
+        </el-container>
+    </el-container>
 
 </div>
 </body>
@@ -144,6 +189,7 @@
     let id = 1000;
     let GlobalData = {
         data:{
+            configData:{},
             name: 'mwy',
             array:[1,2,3,4],
             other:{}
@@ -187,6 +233,11 @@
         },
         data: function () {
             return {
+                scriptDialogVisible:false,
+                configDialogVisible:false,
+                viewDialogVisible:false,
+                actTab:"first",
+                editor:null,
                 latestComponentVersion:"my-cc",
                 visible: false,
                 helloMessage: '<div >Hello from MyComponent!</div>',
@@ -197,10 +248,10 @@
                     children: [],
                     attr:{}
                 }],
-                editNode: {},
+                editNode: {attr:{}},
                 allEnableTag:allTags,
-                datajson:"{}",
-                code:localStorage.getItem("methods") || "",
+                dataConfigJson:localStorage.getItem("dataConfigJson") || "{}",
+                code:localStorage.getItem("methods") || "//不可删除\n" + "let $obj= GlobalData.methods || {};",
                 editorOptions: {
                     selectOnLineNumbers: true,
                     renderLineHighlight: 'none',
@@ -229,14 +280,24 @@
                 }
             }
             findMaxId(this.treeTag);
-            let methods = eval(localStorage.getItem("methods"));
-            if (methods){
-                GlobalData.methods = methods;
+            eval(localStorage.getItem("methods"));
+            this.configDialogBeforeClose(()=>{});
+            this.refreshOut();
+        },
+        computed:{
+            viewConfigJson:function (){
+                console.log("viewConfigJson:",GlobalData.data.other)
+                return JSON.stringify(GlobalData.data.other,null,2)
             }
         },
         methods: {
-            showSize(){
-                console.log("size change",event.target.clientWidth)
+            viewDialogBeforeClose(done){
+                done();
+            },
+            configDialogBeforeClose(done){
+                let obj = eval("GlobalData.data.configData="+this.dataConfigJson);
+                console.log(this.dataConfigJson)
+                done();
             },
             handleDragEnd(draggingNode, dropNode, dropType, ev){
                 console.log('tree drag end: ', dropNode && dropNode.label, dropType);
@@ -287,9 +348,11 @@
             saveData(){
                 localStorage.setItem("treeTagData",JSON.stringify(this.treeTag))
                 localStorage.setItem("methods",this.code)
+                localStorage.setItem("dataConfigJson",this.dataConfigJson)
             },
-            codeFinish(){
+            codeFinish(done){
                 eval(this.code);
+                done();
                 this.refreshOut();
             }
         },
@@ -339,7 +402,9 @@
             let attr = " ";
             if (root.attr){
                 for (let item in root.attr) {
-                    attr += item + "="+ root.attr[item]+" ";
+                    if (root.attr[item] !== undefined && root.attr[item] !== ''){
+                        attr += item + "="+ root.attr[item]+" ";
+                    }
                 }
             }
             l += `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''">`

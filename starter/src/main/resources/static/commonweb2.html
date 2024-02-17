@@ -2,21 +2,48 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <!-- import CSS -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
     <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.14/theme-chalk/index.min.css" rel="stylesheet">
     <style type="text/css">
-        .myBorder:hover{
-            border:1px solid red;
+
+        .custom-tree-node {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            padding-right: 8px;
+        }
+        .treeItemOp:hover{
+            color: #5bb6ff;
+        }
+        .editor-container>div:first-child{
+            height: 500px;
+        }
+        .myEditor{
+            height: 500px;
+        }
+        .beforeI{
+            display:block;
+            height: 10px;
+            background-color: red;
+        }
+        .redBoard{
+            border: 1px solid red;
         }
     </style>
 </head>
 <body>
 <div id="app">
-    <h1>可视化页面编辑器</h1>
-    <my-cc :items="globalCom"></my-cc>
+    <component v-if="latestComponentVersion !=''" v-bind:is="latestComponentVersion" :message="helloMessage" :editnodeid="editNode.id"></component>
 </div>
 </body>
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.min.js"></script>
+<!--<script src="https://unpkg.com/vue@2/dist/vue.js"></script>-->
 <script src="./js/vue2.0.js"></script>
+<!-- import JavaScript -->
+<!--<script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
 <script src="./js/element.js"></script>
 <script src="./js/test.js" ></script>
 <script src="./js/commonweb.js" ></script>
@@ -42,73 +69,112 @@
     }
 
     let id = 1000;
-    //全局数据
     let GlobalData = {
-
-    }
-    //页面组件树
-    let globalCom = [
-        {
-            tag:'el-button',
-            children:[
-                {
-                    tag:'txt',
-                    txt:"this is test txt"
-                }
-            ]
+        data:{
+            configData:{},
+            name: 'mwy',
+            array:[1,2,3,4],
+            other:{}
         },
-        {
-            tag:'el-button',
-            children:[
-                {
-                    tag:'txt',
-                    txt:"this is test txt"
-                }
-            ]
-        },
-        {
-            tag:'p',
-            children:[
-                {
-                    tag:'txt',
-                    txt:"this is test txt"
-                },
-                {
-                    tag:'span',
-                    children:[
-                        {
-                            tag:'txt',
-                            txt:"span"
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-
-    Vue.component("my-cc", {
-        data: function (){
-            return {}
-        },
-        props: ['items'],
-        template:"<div class='myBorder'><template v-for='item in items'><component :is='item.tag' v-if='item.tag != \"txt\"'><my-cc v-if='item.children' :items='item.children'></my-cc></component><template v-if='item.tag == \"txt\"'>{{item.txt}}</template></template></div>",
+        props: ['message'],
         methods: {
-
         }
-    })
+    }
+    let globalCom = {
+        data: function (){
+            return GlobalData.data;
+        },
+        props: ['message'],
+        methods: GlobalData.methods
+    }
 
     vue = new Vue({
         el: '#app',
+        components: {
+        },
         data: function () {
             return {
-                globalCom:globalCom
+
+                latestComponentVersion:"",
+                helloMessage: '<div >Hello from MyComponent!</div>',
+                treeTag: JSON.parse(localStorage.getItem("treeTagData")) || [{
+                    id:1000,
+                    name: "根节点",
+                    tag:"div",
+                    children: [],
+                    attr:{}
+                }],
+                editNode: {},
+                dataConfigJson:localStorage.getItem("dataConfigJson") || "{}",
+                code:localStorage.getItem("methods") || "",
             }
         },
+        mounted(){
 
-        methods: {
+            let methods = eval(localStorage.getItem("methods"));
+            if (methods){
+                GlobalData.methods = methods;
+            }
+            eval("GlobalData.data.configData="+this.dataConfigJson);
+            this.refreshOut();
+        },
+        computed:{
 
         },
+        methods: {
+            refreshOut(){
+                treeRoot = JSON.parse(JSON.stringify(this.treeTag[0]));
+                let t =  buildTree(treeRoot);
+                let copyGlobal = {}
+                copyGlobal.data = function (){return GlobalData.data;};
+                copyGlobal.props = ["editnodeid"]
+                copyGlobal.methods = GlobalData.methods;
+                copyGlobal.template = t;
+                // console.log(copyGlobal)
+                console.log(copyGlobal.template)
+                let cv = "my-cc"+(++id);
+                Vue.component(cv, copyGlobal)
+                this.helloMessage = ++id;
+                this.latestComponentVersion = cv;
+            }
+        },
     })
+    treeRoot = {
+        name: "div",
+        children: []
+    }
+
+    function buildTree(root) {
+        l = "";
+        if (root.tag == 'txt') {
+            l+=`<span :class="${root.id}==editnodeid ? 'redBoard' : ''">${root.content}</span>`
+        }else if (root.selfTag === true) {
+            let attr = " ";
+            if (root.attr){
+                for (let item in root.attr) {
+                    attr += item + "="+ root.attr[item]+" ";
+                }
+            }
+            l += `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''"/>`
+        } else {
+            let attr = " ";
+            if (root.attr){
+                for (let item in root.attr) {
+                    if (root.attr[item] !== undefined && root.attr[item] !== ''){
+                        attr += item + "="+ root.attr[item]+" ";
+                    }
+                }
+            }
+            l += `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''">`
+            if (root.children) {
+                for (let i = 0; i < root.children.length; i++) {
+                    l += buildTree(root.children[i])
+                }
+            }
+            l += `</${root.tag}>`
+        }
+        return l;
+    }
 
 
 </script>
