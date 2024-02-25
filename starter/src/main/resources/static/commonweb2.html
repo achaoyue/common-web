@@ -36,7 +36,7 @@
 </head>
 <body>
 <div id="app">
-    <component v-if="latestComponentVersion !=''" v-bind:is="latestComponentVersion" :message="helloMessage" :editnodeid="editNode.id"></component>
+    <component v-if="latestComponentVersion !=''" v-bind:is="latestComponentVersion" :editnodeid="editNode.id"></component>
 </div>
 </body>
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.min.js"></script>
@@ -67,6 +67,26 @@
     NetUtils.post = function (url,param){
         return axios.post(url,param).then(resp=>resp.data)
     }
+    function parseUrlParams(url) {
+        const params = {};
+        const searchParams = url.split('?')[1].split('&');
+
+        for (const param of searchParams) {
+            const [key, value] = param.split('=');
+
+            if (params.hasOwnProperty(key)) {
+                if (Array.isArray(params[key])) {
+                    params[key].push(value);
+                } else {
+                    params[key] = [params[key], value];
+                }
+            } else {
+                params[key] = value;
+            }
+        }
+
+        return params;
+    }
 
     let id = 1000;
     let GlobalData = {
@@ -80,13 +100,6 @@
         methods: {
         }
     }
-    let globalCom = {
-        data: function (){
-            return GlobalData.data;
-        },
-        props: ['message'],
-        methods: GlobalData.methods
-    }
 
     vue = new Vue({
         el: '#app',
@@ -96,8 +109,7 @@
             return {
 
                 latestComponentVersion:"",
-                helloMessage: '<div >Hello from MyComponent!</div>',
-                treeTag: JSON.parse(localStorage.getItem("treeTagData")) || [{
+                treeTag: [{
                     id:1000,
                     name: "根节点",
                     tag:"div",
@@ -105,26 +117,26 @@
                     attr:{}
                 }],
                 editNode: {},
-                dataConfigJson:localStorage.getItem("dataConfigJson") || "{}",
-                code:localStorage.getItem("methods") || "",
+                dataConfigJson:"{}",
+                code:"",
             }
         },
         mounted(){
-
-            let methods = eval(localStorage.getItem("methods"));
-            if (methods){
-                GlobalData.methods = methods;
-            }
-            eval("GlobalData.data.configData="+this.dataConfigJson);
-            this.refreshOut();
+            let queryParam = parseUrlParams(location.href);
+            NetUtils.get("/data/test/queryWebPage", {pageId:queryParam.pageId}).then(resp=>{
+                let pageData = JSON.parse(resp[0].page_data);
+                this.treeTag = JSON.parse(pageData.treeTagData)
+                GlobalData.methods = eval(pageData.methods);
+                eval("GlobalData.data.configData="+pageData.dataConfigJson);
+                this.refreshOut();
+            })
         },
         computed:{
 
         },
         methods: {
             refreshOut(){
-                treeRoot = JSON.parse(JSON.stringify(this.treeTag[0]));
-                let t =  buildTree(treeRoot);
+                let t =  buildTree(JSON.parse(JSON.stringify(this.treeTag[0])));
                 let copyGlobal = {}
                 copyGlobal.data = function (){return GlobalData.data;};
                 copyGlobal.props = ["editnodeid"]
@@ -134,15 +146,10 @@
                 console.log(copyGlobal.template)
                 let cv = "my-cc"+(++id);
                 Vue.component(cv, copyGlobal)
-                this.helloMessage = ++id;
                 this.latestComponentVersion = cv;
             }
         },
     })
-    treeRoot = {
-        name: "div",
-        children: []
-    }
 
     function buildTree(root) {
         l = "";
@@ -152,7 +159,11 @@
             let attr = " ";
             if (root.attr){
                 for (let item in root.attr) {
-                    attr += item + "="+ root.attr[item]+" ";
+                    if (root.attr[item].startsWith(":")){
+                        attr += ":"+item + "="+ root.attr[item].slice(1)+" ";
+                    }else {
+                        attr += item + "="+ root.attr[item]+" ";
+                    }
                 }
             }
             l += `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''"/>`
@@ -161,7 +172,11 @@
             if (root.attr){
                 for (let item in root.attr) {
                     if (root.attr[item] !== undefined && root.attr[item] !== ''){
-                        attr += item + "="+ root.attr[item]+" ";
+                        if (root.attr[item].startsWith(":")){
+                            attr += ":"+item + "="+ root.attr[item].slice(1)+" ";
+                        }else {
+                            attr += item + "="+ root.attr[item]+" ";
+                        }
                     }
                 }
             }
@@ -175,7 +190,6 @@
         }
         return l;
     }
-
 
 </script>
 </html>

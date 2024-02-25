@@ -47,8 +47,8 @@
 <div id="app">
     <el-container>
         <el-header style="position: fixed;height: 60px;width: 100%; background-color: #3a8ee6">
-            <span style="font-size: 20px;font-weight: bold;line-height: 60px">可视化页面编辑器</span>
-            <el-button icon="el-icon-success" type="success" style="float: right;margin-top: 9px" @click="saveData">保存</el-button>
+            <span style="font-size: 20px;font-weight: bold;line-height: 60px">可视化页面编辑器:{{this.pageId}}</span>
+            <el-button icon="el-icon-success" type="success" style="float: right;margin-top: 9px" @click="saveToRemote">保存</el-button>
         </el-header>
         <el-container style="padding-top: 60px">
             <el-aside width="250px">
@@ -103,7 +103,7 @@
                                     :options="editorOptions"
                             ></monaco-editor>
                         </el-dialog>
-                        <el-button @click="scriptDialogVisible=true">视图类</el-button>
+                        <el-button @click="scriptDialogVisible=true">脚本类</el-button>
                         <el-dialog
                                 v-if="scriptDialogVisible"
                                 title="视图类数据"
@@ -129,7 +129,7 @@
                 <div class="grid-content bg-purple" v-if="editNode != null && editNode.tag">
                     节点名称:<el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
                     节点标签:
-                    <el-select v-model="editNode.tag" placeholder="请选择">
+                    <el-select v-model="editNode.tag" filterable placeholder="请选择">
                         <el-option
                             v-for="item of allEnableTag"
                             :key="item.tag"
@@ -150,9 +150,11 @@
                         <el-input v-model="editNode.attr['v-if']"></el-input>
                         <span>@click</span>
                         <el-input v-model="editNode.attr['@click']"></el-input>
+                        <span>绑定变量</span>
+                        <el-input v-model="editNode.attr['v-model']"></el-input>
 
                         <el-divider content-position="left">标签属性</el-divider>
-                        <div v-for="item in (allEnableTag[editNode.tag] ? allEnableTag[editNode.tag].props : [])">
+                        <div v-for="item in (allEnableTag[editNode.tag] ? getAllProps(allEnableTag[editNode.tag].props,editNode) : [])">
                             <span>{{item.name}}</span>
                             <span>{{item.key}}</span>
                             <el-input v-model="editNode.attr[item.key]"></el-input>
@@ -192,6 +194,32 @@
     }
     NetUtils.post = function (url,param){
         return axios.post(url,param).then(resp=>resp.data)
+    }
+    function randomPageId() {
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
+    }
+    function parseUrlParams(url) {
+        const params = {};
+        const searchParams = url.split('?')[1].split('&');
+
+        for (const param of searchParams) {
+            const [key, value] = param.split('=');
+
+            if (params.hasOwnProperty(key)) {
+                if (Array.isArray(params[key])) {
+                    params[key].push(value);
+                } else {
+                    params[key] = [params[key], value];
+                }
+            } else {
+                params[key] = value;
+            }
+        }
+
+        return params;
     }
 
     let id = 1000;
@@ -241,6 +269,7 @@
         },
         data: function () {
             return {
+                pageId:"",
                 scriptDialogVisible:false,
                 configDialogVisible:false,
                 viewDialogVisible:false,
@@ -291,6 +320,8 @@
             eval(localStorage.getItem("methods"));
             this.configDialogBeforeClose(()=>{});
             this.refreshOut();
+            let queryParam = parseUrlParams(location.href);
+            this.pageId = queryParam.pageId;
         },
         computed:{
             viewConfigJson:function (){
@@ -299,6 +330,28 @@
             }
         },
         methods: {
+            getAllProps(props,editNode){
+                let p = {};
+                let allAttr = Object.keys(editNode.attr);
+                for (let attrKey of allAttr) {
+                    if (editNode.attr[attrKey] != null && editNode.attr[attrKey] != ""){
+                        p[attrKey] = {
+                            name:attrKey,
+                            key:attrKey
+                        }
+                    }
+                }
+                if (props){
+                    for (let prop of props) {
+                        p[prop.key] = prop
+                    }
+                }
+                let arr = [];
+                for(let key in p){
+                    arr.push(p[key]);
+                }
+                return  arr.sort((a,b)=>{return a.key>b.key?1:a.key<b.key?-1:0})
+            },
             viewDialogBeforeClose(done){
                 done();
             },
@@ -358,6 +411,32 @@
                 localStorage.setItem("methods",this.code)
                 localStorage.setItem("dataConfigJson",this.dataConfigJson)
             },
+            saveToRemote(){
+                let pageData = {
+                    treeTagData:JSON.stringify(this.treeTag),
+                    methods:this.code,
+                    dataConfigJson:this.dataConfigJson
+                }
+                let update = true;
+                if (!this.pageId){
+                    this.pageId = randomPageId();
+                    update = false;
+                }
+                let param ={
+                    pageId:this.pageId,
+                    pageData:JSON.stringify(pageData)
+                }
+                if (!update){
+                    NetUtils.post("/data/test/createWebPage",param).then(resp=>{
+                        alert("页面保存成功")
+                    })
+                }else{
+                    NetUtils.post("/data/test/updateWebPage",param).then(resp=>{
+                        alert("页面保存成功")
+                    })
+                }
+
+            },
             codeFinish(done){
                 eval(this.code);
                 done();
@@ -402,7 +481,11 @@
             let attr = " ";
             if (root.attr){
                 for (let item in root.attr) {
-                    attr += item + "="+ root.attr[item]+" ";
+                    if (root.attr[item].startsWith(":")){
+                        attr += ":"+item + "="+ root.attr[item].slice(1)+" ";
+                    }else {
+                        attr += item + "="+ root.attr[item]+" ";
+                    }
                 }
             }
             l += `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''"/>`
@@ -411,7 +494,11 @@
             if (root.attr){
                 for (let item in root.attr) {
                     if (root.attr[item] !== undefined && root.attr[item] !== ''){
-                        attr += item + "="+ root.attr[item]+" ";
+                        if (root.attr[item].startsWith(":")){
+                            attr += ":"+item + "="+ root.attr[item].slice(1)+" ";
+                        }else {
+                            attr += item + "="+ root.attr[item]+" ";
+                        }
                     }
                 }
             }

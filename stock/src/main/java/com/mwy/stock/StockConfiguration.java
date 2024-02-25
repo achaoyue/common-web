@@ -1,5 +1,6 @@
 package com.mwy.stock;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
 import tk.mybatis.spring.annotation.MapperScan;
 
@@ -8,6 +9,7 @@ import tk.mybatis.spring.annotation.MapperScan;
  */
 @MapperScan("com.mwy.stock.reponstory.mapper")
 @ComponentScan(basePackages = "com.mwy.stock")
+@ConditionalOnProperty(value = "spring.stock",havingValue = "true")
 public class StockConfiguration {
 
 }

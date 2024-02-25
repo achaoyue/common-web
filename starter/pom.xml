@@ -14,17 +14,17 @@
     <packaging>jar</packaging>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.mwy</groupId>-->
-<!--            <artifactId>websocket</artifactId>-->
-<!--            <version>0.0.1-SNAPSHOT</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.mwy</groupId>
+            <artifactId>websocket</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.mwy</groupId>-->
-<!--            <artifactId>common-save</artifactId>-->
-<!--            <version>0.0.1-SNAPSHOT</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.mwy</groupId>
+            <artifactId>common-save</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
             <groupId>com.mwy</groupId>

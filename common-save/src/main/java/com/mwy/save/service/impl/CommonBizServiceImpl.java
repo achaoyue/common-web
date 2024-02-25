@@ -8,6 +8,7 @@ import com.mwy.save.modal.ParamConfigModal;
 import com.mwy.save.reponstory.dao.StatementDao;
 import com.mwy.save.reponstory.dao.modal.StatementDO;
 import com.mwy.save.reponstory.dao.modal.StatementXmlDO;
+import com.mwy.save.reponstory.mapper.CommonDataMapper;
 import com.mwy.save.reponstory.mapper.StatementXmlMapper;
 import com.mwy.save.service.CommonBizService;
 import java.io.ByteArrayInputStream;
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,9 @@ public class CommonBizServiceImpl implements CommonBizService {
     StatementXmlMapper statementXmlMapper;
     @Resource
     StatementDao statementDao;
+
+    @Resource
+    private CommonDataMapper commonDataMapper;
 
     @Override
     public Object exe(String uqKey, HttpServletRequest request){
@@ -164,6 +169,10 @@ public class CommonBizServiceImpl implements CommonBizService {
                 return param;
             }else if("update".equals(statementDO.getType() )){
                 return sqlSession.update(statementDO.getStatementId(),param);
+            }else if("selectPlanSql".equals(statementDO.getType())){
+                return commonDataMapper.select(statementDO.getStatementId(), param);
+            }else if("updatePlanSql".equals(statementDO.getType())){
+                return commonDataMapper.update(statementDO.getStatementId(), param);
             }
         } finally {
 
