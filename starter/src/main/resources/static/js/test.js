@@ -3306,6 +3306,10 @@ allTags = {
             {
                 "name": "icon",
                 "key": "icon"
+            },
+            {
+                "name": "target",
+                "key": "target"
             }
         ]
     },

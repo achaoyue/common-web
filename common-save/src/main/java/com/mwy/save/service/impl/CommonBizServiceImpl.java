@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.mwy.base.util.SequenceUtils;
 import com.mwy.save.modal.ParamConfigModal;
 import com.mwy.save.reponstory.dao.StatementDao;
 import com.mwy.save.reponstory.dao.modal.StatementDO;
@@ -11,22 +12,22 @@ import com.mwy.save.reponstory.dao.modal.StatementXmlDO;
 import com.mwy.save.reponstory.mapper.CommonDataMapper;
 import com.mwy.save.reponstory.mapper.StatementXmlMapper;
 import com.mwy.save.service.CommonBizService;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.ibatis.builder.xml.XMLMapperBuilder;
-import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 /**
  * @author mouwenyao 2020/8/22 7:49 下午
@@ -136,6 +137,13 @@ public class CommonBizServiceImpl implements CommonBizService {
                     param.put(e.getParamName(),JSON.parse(parameter));
                 }else if(e.getDefaultValue() != null){
                     param.put(e.getParamName(),e.getDefaultValue());
+                }
+            } else if ("seq".equals(e.getType())) {
+                String parameter = map.getString(e.getParamPath());
+                if (!StringUtils.isEmpty(parameter)) {
+                    param.put(e.getParamName(), parameter);
+                } else {
+                    param.put(e.getParamName(), SequenceUtils.getSeqCode());
                 }
             }
         });

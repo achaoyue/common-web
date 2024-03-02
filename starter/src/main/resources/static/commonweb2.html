@@ -92,8 +92,6 @@
     let GlobalData = {
         data:{
             configData:{},
-            name: 'mwy',
-            array:[1,2,3,4],
             other:{}
         },
         props: ['message'],
@@ -126,7 +124,7 @@
             NetUtils.get("/data/test/queryWebPage", {pageId:queryParam.pageId}).then(resp=>{
                 let pageData = JSON.parse(resp[0].page_data);
                 this.treeTag = JSON.parse(pageData.treeTagData)
-                GlobalData.methods = eval(pageData.methods);
+                eval(pageData.methods);
                 eval("GlobalData.data.configData="+pageData.dataConfigJson);
                 this.refreshOut();
             })

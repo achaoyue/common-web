@@ -2,8 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <!-- import CSS -->
-<!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
     <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.14/theme-chalk/index.min.css" rel="stylesheet">
     <style type="text/css">
         html,
@@ -12,9 +10,11 @@
             padding: 0;
             height: 100%;
         }
-        #app,.box{
+
+        #app, .box {
             height: 100%;
         }
+
         .el-container {
             height: 100%;
         }
@@ -28,15 +28,19 @@
             font-size: 14px;
             padding-right: 8px;
         }
-        .treeItemOp:hover{
+
+        .treeItemOp:hover {
             color: #5bb6ff;
         }
-        .myEditor{
+
+        .myEditor {
             height: 500px;
         }
-        .redBoard{
+
+        .redBoard {
             border: 1px solid red;
         }
+
         .el-tree {
             display: inline-block;
             min-width: 100%;
@@ -48,7 +52,12 @@
     <el-container>
         <el-header style="position: fixed;height: 60px;width: 100%; background-color: #3a8ee6">
             <span style="font-size: 20px;font-weight: bold;line-height: 60px">可视化页面编辑器:{{this.pageId}}</span>
-            <el-button icon="el-icon-success" type="success" style="float: right;margin-top: 9px" @click="saveToRemote">保存</el-button>
+            <el-button icon="el-icon-success" type="success" style="float: right;margin-top: 9px" @click="saveToRemote">
+                保存
+            </el-button>
+            <el-Button icon="el-icon-refresh" type="success" style="float: right;margin-top: 9px;margin-right: 5px"
+                       @click="refreshOut">刷新
+            </el-Button>
         </el-header>
         <el-container style="padding-top: 60px">
             <el-aside width="250px">
@@ -66,7 +75,7 @@
                                 <span class="custom-tree-node" slot-scope="{ node, data }">
                                     <span :class="data.id==editNode.id ? 'redBoard' : ''">{{ data.name || data.tag }}</span>
                                     <span>
-                                        <i class="el-icon-circle-plus treeItemOp" @click="() => append(data)" ></i>
+                                        <i class="el-icon-circle-plus treeItemOp" @click="() => append(data)"></i>
                                         <i class="el-icon-remove treeItemOp" @click="() => remove(node, data)"></i>
                                     </span>
                                 </span>
@@ -121,24 +130,26 @@
                 </el-tabs>
             </el-aside>
             <el-main>
-                <el-Button @click="refreshOut">刷新</el-Button>
-                <!--                <my-cc :message="helloMessage"></my-cc>-->
-                <component v-bind:is="latestComponentVersion" :message="helloMessage" :editnodeid="editNode.id"></component>
+                <component v-if="latestComponentVersion != ''" v-bind:is="latestComponentVersion"
+                           :editnodeid="editNode.id"></component>
             </el-main>
             <el-aside width="250px">
                 <div class="grid-content bg-purple" v-if="editNode != null && editNode.tag">
-                    节点名称:<el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
+                    节点名称:
+                    <el-input v-model="editNode.name" :placeholder="editNode.tag"></el-input>
                     节点标签:
                     <el-select v-model="editNode.tag" filterable placeholder="请选择">
                         <el-option
-                            v-for="item of allEnableTag"
-                            :key="item.tag"
-                            :label="item.tag"
-                            :value="item.tag">
+                                v-for="item of allEnableTag"
+                                :key="item.tag"
+                                :label="item.tag"
+                                :value="item.tag">
                         </el-option>
                     </el-select>
                     <template v-if="editNode.tag=='txt'">
-                        <div>文本内容:<el-input v-model="editNode.content"></el-input></div>
+                        <div>文本内容:
+                            <el-input v-model="editNode.content"></el-input>
+                        </div>
                     </template>
                     <template v-if="editNode.tag!='txt'">
                         <el-divider content-position="left">vue属性</el-divider>
@@ -168,19 +179,16 @@
 </div>
 </body>
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.min.js"></script>
-<!--<script src="https://unpkg.com/vue@2/dist/vue.js"></script>-->
 <script src="./js/vue2.0.js"></script>
-<!-- import JavaScript -->
-<!--<script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
 <script src="./js/element.js"></script>
-<script src="./js/test.js" ></script>
-<script src="./js/commonweb.js" ></script>
-<script src="./js/2.vue-editor.js" ></script>
-<script src="./js/64.vue-editor.js" ></script>
-<script src="./js/vue-editor.js" ></script>
+<script src="./js/test.js"></script>
+<script src="./js/commonweb.js"></script>
+<script src="./js/2.vue-editor.js"></script>
+<script src="./js/64.vue-editor.js"></script>
+<script src="./js/vue-editor.js"></script>
 <script>
 
-    Array.prototype.remove = function(b) {
+    Array.prototype.remove = function (b) {
         var a = this.indexOf(b);
         if (a >= 0) {
             this.splice(a, 1);
@@ -189,18 +197,23 @@
         return false;
     };
     NetUtils = {};
-    NetUtils.get = function (url,param){
-        return axios.get(url,{params:param}).then(resp=>resp.data)
+    NetUtils.get = function (url, param) {
+        return axios.get(url, {params: param}).then(resp => resp.data)
     }
-    NetUtils.post = function (url,param){
-        return axios.post(url,param).then(resp=>resp.data)
+    NetUtils.post = function (url, param) {
+        return axios.post(url, param).then(resp => resp.data)
     }
+
+    //随机页面id
     function randomPageId() {
         function S4() {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         }
+
         return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
     }
+
+    //url参数解析
     function parseUrlParams(url) {
         const params = {};
         const searchParams = url.split('?')[1].split('&');
@@ -224,71 +237,41 @@
 
     let id = 1000;
     let GlobalData = {
-        data:{
-            configData:{},
-            name: 'mwy',
-            array:[1,2,3,4],
-            other:{}
+        data: {
+            configData: {},
+            other: {}
         },
-        props: ['message'],
-        methods: {
-            ccA () {
-                alert("cc")
-                console.log(this)
-            },
-            sendMsg(){
-                alert("sendMsg");
-                this.array.push(++id);
-            },
-            addOne(){
-
-            },
-            didEvent(e,param){
-                methodConfig[e].run(param);
-            }
-
-        }
+        methods: {}
     }
-    let globalCom = {
-        data: function (){
-            return GlobalData.data;
-        },
-        props: ['message'],
-        template:"<div v-on:click='ccA'>{{message}} cc</div>",
-        methods: GlobalData.methods
-    }
-    let copyGlobal = JSON.parse(JSON.stringify(globalCom));
-    copyGlobal.methods = globalCom.methods;
-    Vue.component("my-cc", copyGlobal)
 
 
     vue = new Vue({
         el: '#app',
         components: {
-            MonacoEditor:MonacoEditor.default
+            MonacoEditor: MonacoEditor.default
         },
         data: function () {
             return {
-                pageId:"",
-                scriptDialogVisible:false,
-                configDialogVisible:false,
-                viewDialogVisible:false,
-                actTab:"first",
-                editor:null,
-                latestComponentVersion:"my-cc",
+                pageId: "",
+                scriptDialogVisible: false,
+                configDialogVisible: false,
+                viewDialogVisible: false,
+                actTab: "first",
+                editor: null,
+                latestComponentVersion: "",
                 visible: false,
                 helloMessage: '<div >Hello from MyComponent!</div>',
-                treeTag: JSON.parse(localStorage.getItem("treeTagData")) || [{
-                    id:1000,
+                treeTag: [{
+                    id: 1000,
                     name: "根节点",
-                    tag:"div",
+                    tag: "div",
                     children: [],
-                    attr:{}
+                    attr: {}
                 }],
-                editNode: {attr:{}},
-                allEnableTag:allTags,
-                dataConfigJson:localStorage.getItem("dataConfigJson") || "{}",
-                code:localStorage.getItem("methods") || "//不可删除\n" + "let $obj= GlobalData.methods || {};",
+                editNode: {attr: {}},
+                allEnableTag: allTags,
+                dataConfigJson: "{}",
+                code: "//不可删除\n" + "let $obj= GlobalData.methods || {};",
                 editorOptions: {
                     selectOnLineNumbers: true,
                     renderLineHighlight: 'none',
@@ -304,83 +287,121 @@
                 },
             }
         },
-        mounted(){
-            function findMaxId(r){
+        mounted() {
+            function findMaxId(r, maxId) {
                 for (let item of r) {
-                    if (item.id > id){
-                        id = item.id;
-                        console.log("fixMaxId:"+id)
-                    }
-                    if (item.children){
-                        findMaxId(item.children)
+                    maxId = Math.max(item.id, maxId)
+                    if (item.children && item.children.length > 0) {
+                        maxId = Math.max(findMaxId(item.children, maxId), maxId)
                     }
                 }
+                return maxId;
             }
-            findMaxId(this.treeTag);
-            eval(localStorage.getItem("methods"));
-            this.configDialogBeforeClose(()=>{});
-            this.refreshOut();
+
             let queryParam = parseUrlParams(location.href);
             this.pageId = queryParam.pageId;
+
+            if (this.pageId !== "" && this.pageId !== undefined && this.pageId !== null) {
+                //本地加载
+                let pageLocalData = JSON.parse(localStorage.getItem(this.pageId))
+                if (pageLocalData){
+                    this.treeTag = JSON.parse(pageLocalData.treeTagData)
+                    this.code = pageLocalData.methods;
+                    this.dataConfigJson = pageLocalData.dataConfigJson;
+                    eval(pageLocalData.methods);
+                    eval("GlobalData.data.configData=" + pageLocalData.dataConfigJson);
+                    id = findMaxId(this.treeTag, id);
+                    this.refreshOut();
+                }
+
+                //远程加载
+                NetUtils.get("/data/test/queryWebPage", {pageId: queryParam.pageId}).then(resp => {
+                    this.$confirm('检测到远程数据，是否采用', '确认信息', {
+                        distinguishCancelAndClose: true,
+                        confirmButtonText: '采用',
+                        cancelButtonText: '放弃'
+                    }).then(() => {
+                        //远程数据
+                        let pageData = JSON.parse(resp[0].page_data);
+                        this.treeTag = JSON.parse(pageData.treeTagData)
+                        this.code = pageData.methods;
+                        this.dataConfigJson = pageData.dataConfigJson;
+                        eval(pageData.methods);
+                        eval("GlobalData.data.configData=" + pageData.dataConfigJson);
+                        id = findMaxId(this.treeTag, 1000);
+                        this.$message({
+                            type: 'info',
+                            message: '采用远程'
+                        });
+                        this.refreshOut();
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '采用本地'
+                        });
+                    })
+                })
+            }
         },
-        computed:{
-            viewConfigJson:function (){
-                console.log("viewConfigJson:",GlobalData.data.other)
-                return JSON.stringify(GlobalData.data.other,null,2)
+        computed: {
+            viewConfigJson: function () {
+                console.log("viewConfigJson:", GlobalData.data.other)
+                return JSON.stringify(GlobalData.data.other, null, 2)
             }
         },
         methods: {
-            getAllProps(props,editNode){
+            getAllProps(props, editNode) {
                 let p = {};
                 let allAttr = Object.keys(editNode.attr);
                 for (let attrKey of allAttr) {
-                    if (editNode.attr[attrKey] != null && editNode.attr[attrKey] != ""){
+                    if (editNode.attr[attrKey] != null && editNode.attr[attrKey] != "") {
                         p[attrKey] = {
-                            name:attrKey,
-                            key:attrKey
+                            name: attrKey,
+                            key: attrKey
                         }
                     }
                 }
-                if (props){
+                if (props) {
                     for (let prop of props) {
                         p[prop.key] = prop
                     }
                 }
                 let arr = [];
-                for(let key in p){
+                for (let key in p) {
                     arr.push(p[key]);
                 }
-                return  arr.sort((a,b)=>{return a.key>b.key?1:a.key<b.key?-1:0})
+                return arr.sort((a, b) => {
+                    return a.key > b.key ? 1 : a.key < b.key ? -1 : 0
+                })
             },
-            viewDialogBeforeClose(done){
+            viewDialogBeforeClose(done) {
                 done();
             },
-            configDialogBeforeClose(done){
-                let obj = eval("GlobalData.data.configData="+this.dataConfigJson);
+            configDialogBeforeClose(done) {
+                let obj = eval("GlobalData.data.configData=" + this.dataConfigJson);
                 console.log(this.dataConfigJson)
                 done();
             },
-            handleDragEnd(draggingNode, dropNode, dropType, ev){
+            handleDragEnd(draggingNode, dropNode, dropType, ev) {
                 console.log('tree drag end: ', dropNode && dropNode.label, dropType);
             },
-            refreshOut(){
-                treeRoot = JSON.parse(JSON.stringify(this.treeTag[0]));
-                let t =  buildTree(treeRoot);
+            refreshOut() {
+                let t = buildTree(JSON.parse(JSON.stringify(this.treeTag[0])));
                 let copyGlobal = {}
-                copyGlobal.data = function (){return GlobalData.data;};
+                copyGlobal.data = function () {
+                    return GlobalData.data;
+                };
                 copyGlobal.props = ["editnodeid"]
                 copyGlobal.methods = GlobalData.methods;
                 copyGlobal.template = t;
-                // console.log(copyGlobal)
                 console.log(copyGlobal.template)
-                let cv = "my-cc"+(++id);
+                let cv = "my-cc" + (++id);
                 Vue.component(cv, copyGlobal)
-                this.helloMessage = ++id;
                 this.latestComponentVersion = cv;
                 this.saveData();
             },
             append(data) {
-                const newChild = {id: ++id, tag: 'div', children: [], attr:{}};
+                const newChild = {id: ++id, tag: 'div', children: [], attr: {}};
                 if (!data.children) {
                     this.$set(data, 'children', []);
                 }
@@ -388,7 +409,7 @@
                 this.refreshOut();
             },
             remove(node, data) {
-                if (!this.treeTag || (this.treeTag.length == 1 && this.treeTag[0] == data)){
+                if (!this.treeTag || (this.treeTag.length == 1 && this.treeTag[0] == data)) {
                     alert("根节点必须有一个")
                     return;
                 }
@@ -398,7 +419,7 @@
                 children.splice(index, 1);
                 this.refreshOut();
             },
-            handleNodeClick(data){
+            handleNodeClick(data) {
                 this.editNode = data;
                 console.log(data)
             },
@@ -406,109 +427,91 @@
                 this.total += 1
                 console.log(this.total)
             },
-            saveData(){
-                localStorage.setItem("treeTagData",JSON.stringify(this.treeTag))
-                localStorage.setItem("methods",this.code)
-                localStorage.setItem("dataConfigJson",this.dataConfigJson)
-            },
-            saveToRemote(){
+            saveData() {
                 let pageData = {
-                    treeTagData:JSON.stringify(this.treeTag),
-                    methods:this.code,
-                    dataConfigJson:this.dataConfigJson
+                    treeTagData: JSON.stringify(this.treeTag),
+                    methods: this.code,
+                    dataConfigJson: this.dataConfigJson
+                }
+                this.pageId = this.pageId || randomPageId();
+                localStorage.setItem(this.pageId, JSON.stringify(pageData));
+            },
+            saveToRemote() {
+                let pageData = {
+                    treeTagData: JSON.stringify(this.treeTag),
+                    methods: this.code,
+                    dataConfigJson: this.dataConfigJson
                 }
                 let update = true;
-                if (!this.pageId){
+                if (!this.pageId) {
                     this.pageId = randomPageId();
                     update = false;
                 }
-                let param ={
-                    pageId:this.pageId,
-                    pageData:JSON.stringify(pageData)
+                let param = {
+                    pageId: this.pageId,
+                    pageData: JSON.stringify(pageData)
                 }
-                if (!update){
-                    NetUtils.post("/data/test/createWebPage",param).then(resp=>{
+                if (!update) {
+                    NetUtils.post("/data/test/createWebPage", param).then(resp => {
                         alert("页面保存成功")
                     })
-                }else{
-                    NetUtils.post("/data/test/updateWebPage",param).then(resp=>{
+                } else {
+                    NetUtils.post("/data/test/updateWebPage", param).then(resp => {
                         alert("页面保存成功")
                     })
                 }
 
             },
-            codeFinish(done){
+            codeFinish(done) {
                 eval(this.code);
                 done();
                 this.refreshOut();
             }
         },
-    })
-    function toGString(obj){
-        let str = "let $obj={};";
-        for (const key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                str += "$obj." +key + '=';
-                const value = obj[key];
-                if (typeof value === 'function'){
-                    let ts = Function.prototype.toString.call(value);
-                    if (ts.startsWith("function")){
-                        str += ts;
-                    }else str += " function " + ts;
-                }else{
-                    str += JSON.stringify(value);
-                }
-                 str += '\n;';
-            }
-        }
-        return str += ";$obj;";
-    }
-    treeRoot = {
-        name: "div",
-        children: []
-    }
-
-    treeRoot.children.push({
-        name: "el-Button",
-        children: [{name: 'txt', content: "xxx"}]
+        errorCaptured(error, vm, info) {
+            console.error('Component Error Handler:', error, vm, info);
+            this.result = "An error occurred. Please try again later.";
+            return false;
+        },
     })
 
-    function buildTree(root) {
-        l = "";
+    function buildTree(root, preBlank) {
+        preBlank = preBlank === undefined ? " " : preBlank
+        let l = "";
         if (root.tag == 'txt') {
-            l+=`<span :class="${root.id}==editnodeid ? 'redBoard' : ''">${root.content}</span>`
-        }else if (root.selfTag === true) {
+            l += preBlank + `<span :class="${root.id}==editnodeid ? 'redBoard' : ''">${root.content}</span>\n`
+        } else if (root.selfTag === true) {
             let attr = " ";
-            if (root.attr){
+            if (root.attr) {
                 for (let item in root.attr) {
-                    if (root.attr[item].startsWith(":")){
-                        attr += ":"+item + "="+ root.attr[item].slice(1)+" ";
-                    }else {
-                        attr += item + "="+ root.attr[item]+" ";
+                    if (root.attr[item].startsWith(":")) {
+                        attr += ":" + item + "=" + root.attr[item].slice(1) + " ";
+                    } else {
+                        attr += item + "=" + root.attr[item] + " ";
                     }
                 }
             }
-            l += `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''"/>`
+            l += preBlank + `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''"/>\n`
         } else {
             let attr = " ";
-            if (root.attr){
+            if (root.attr) {
                 for (let item in root.attr) {
-                    if (root.attr[item] !== undefined && root.attr[item] !== ''){
-                        if (root.attr[item].startsWith(":")){
-                            attr += ":"+item + "="+ root.attr[item].slice(1)+" ";
-                        }else {
-                            attr += item + "="+ root.attr[item]+" ";
+                    if (root.attr[item] !== undefined && root.attr[item] !== '') {
+                        if (root.attr[item].startsWith(":")) {
+                            attr += ":" + item + "=" + root.attr[item].slice(1) + " ";
+                        } else {
+                            attr += item + "=" + root.attr[item] + " ";
                         }
                     }
                 }
             }
-            l += `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''">`
+            l += preBlank + `<${root.tag} ${attr} :class="${root.id}==editnodeid ? 'redBoard' : ''">\n`
             if (root.children) {
                 for (let i = 0; i < root.children.length; i++) {
-                    l += buildTree(root.children[i])
+                    l += buildTree(root.children[i], preBlank + "  ")
                 }
             }
-            l += `</${root.tag}>`
+            l += preBlank + `</${root.tag}> \n`
         }
         return l;
     }
