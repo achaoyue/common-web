@@ -181,6 +181,8 @@ public class CommonBizServiceImpl implements CommonBizService {
                 return commonDataMapper.select(statementDO.getStatementId(), param);
             }else if("updatePlanSql".equals(statementDO.getType())){
                 return commonDataMapper.update(statementDO.getStatementId(), param);
+            }else if("anySql".equals(statementDO.getType())){
+                return commonDataMapper.update((String) param.get("sql"), param);
             }
         } finally {
 
