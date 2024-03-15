@@ -8,6 +8,7 @@ import com.mwy.base.util.HttpsUtils;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockFundDTO;
+import com.mwy.stock.modal.dto.easymoney.StockQueue;
 import com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -291,5 +292,75 @@ public class EasyMoneyRepository {
         } catch (NumberFormatException e) {
             return Double.valueOf(0);
         }
+    }
+
+    public StockQueue crowQueue(String stockNum){
+        String url = "http://push2.eastmoney.com/api/qt/stock/get";
+
+
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("pn", "1");
+        param.put("pz", "6000");
+        param.put("po", "1");
+        param.put("np", "1");
+        param.put("ut", "bd1d9ddb04089700cf9c27f6f7426281");
+        param.put("fltt", "2");
+        param.put("invt", "2");
+        param.put("fid", "f3");
+        param.put("fs", "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048");
+        param.put("fields", "f120,f121,f122,f174,f175,f59,f163,f43,f57,f58,f169,f170,f46,f44,f51,f168,f47,f164,f116,f60,f45,f52,f50,f48,f167,f117,f71,f161,f49,f530,f135,f136,f137,f138,f139,f141,f142,f144,f145,f147,f148,f140,f143,f146,f149,f55,f62,f162,f92,f173,f104,f105,f84,f85,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f107,f111,f86,f177,f78,f110,f262,f263,f264,f267,f268,f255,f256,f257,f258,f127,f199,f128,f198,f259,f260,f261,f171,f277,f278,f279,f288,f152,f250,f251,f252,f253,f254,f269,f270,f271,f272,f273,f274,f275,f276,f265,f266,f289,f290,f286,f285,f292,f293,f294,f295");
+        param.put("invt", "2");
+        param.put("secid", "1." + stockNum);
+        if (stockNum.startsWith("6")) {
+            param.put("secid", "1." + stockNum);
+        } else if (stockNum.startsWith("00") || stockNum.startsWith("3")) {
+            param.put("secid", "0." + stockNum);
+        } else {
+            param.put("secid", "1." + stockNum);
+        }
+
+        String sendResult = HttpsUtils.doGetString(url, param);
+
+        JSONObject data = new JSONObject();
+        try {
+            data = JSONObject.parseObject(sendResult).getJSONObject("data");
+        } catch (JSONException e) {
+            log.error("解析jsonb报错：" + data.toJSONString());
+        } catch (NullPointerException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+
+        Map<String, Object> map = (Map) data;
+        StockQueue stockBean = new StockQueue();
+        stockBean.setBuyOne(objectToBigDecimal(map.get("f20")));
+        stockBean.setBuyOnePrice(objectToBigDecimal(map.get("f19")));
+        stockBean.setBuyTwo(objectToBigDecimal(map.get("f18")));
+        stockBean.setBuyTwoPrice(objectToBigDecimal(map.get("f17")));
+        stockBean.setBuyThree(objectToBigDecimal(map.get("f16")));
+        stockBean.setBuyThreePrice(objectToBigDecimal(map.get("f15")));
+        stockBean.setBuyFour(objectToBigDecimal(map.get("f14")));
+        stockBean.setBuyFourPrice(objectToBigDecimal(map.get("f13")));
+        stockBean.setBuyFive(objectToBigDecimal(map.get("f12")));
+        stockBean.setBuyFivePrice(objectToBigDecimal(map.get("f11")));
+
+        stockBean.setSoldOne(objectToBigDecimal(map.get("f40")));
+        stockBean.setSoldOnePrice(objectToBigDecimal(map.get("f39")));
+        stockBean.setSoldTwo(objectToBigDecimal(map.get("f38")));
+        stockBean.setSoldTwoPrice(objectToBigDecimal(map.get("f37")));
+        stockBean.setSoldThree(objectToBigDecimal(map.get("f36")));
+        stockBean.setSoldThreePrice(objectToBigDecimal(map.get("f35")));
+        stockBean.setSoldFour(objectToBigDecimal(map.get("f34")));
+        stockBean.setSoldFourPrice(objectToBigDecimal(map.get("f33")));
+        stockBean.setSoldFive(objectToBigDecimal(map.get("f32")));
+        stockBean.setSoldFivePrice(objectToBigDecimal(map.get("f31")));
+
+        return stockBean;
+    }
+
+    public static void main(String[] args) {
+        EasyMoneyRepository easyMoneyRepository = new EasyMoneyRepository();
+        StockQueue sz000001 = easyMoneyRepository.crowQueue("000001");
+        System.out.println(sz000001);
     }
 }

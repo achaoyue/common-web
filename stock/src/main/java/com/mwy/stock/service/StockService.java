@@ -12,13 +12,13 @@ import com.mwy.stock.modal.co.CommonPair;
 import com.mwy.stock.modal.co.LineCO;
 import com.mwy.stock.modal.co.LinesCO;
 import com.mwy.stock.modal.co.MarkPoint;
+import com.mwy.stock.modal.converter.StockBuyQueueConvertor;
 import com.mwy.stock.modal.converter.StockConvertor;
-import com.mwy.stock.modal.dto.DataBoardDTO;
-import com.mwy.stock.modal.dto.ProgressDTO;
-import com.mwy.stock.modal.dto.StockAttribute;
+import com.mwy.stock.modal.dto.*;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockFundDTO;
+import com.mwy.stock.modal.dto.easymoney.StockQueue;
 import com.mwy.stock.modal.qry.FavoriteEditParam;
 import com.mwy.stock.reponstory.dao.*;
 import com.mwy.stock.reponstory.dao.modal.*;
@@ -68,6 +68,9 @@ public class StockService {
 
     @Resource
     private StockNoticeHistoryDao stockNoticeHistoryDao;
+
+    @Resource
+    private StockBuyQueueDao stockBuyQueueDao;
 
     private static boolean STOP = false;
 
@@ -264,10 +267,10 @@ public class StockService {
         //各行业龙头
         List<StockDO> stockDOS = stockDao.queryTopByIndustry(date);
         Map<String, StockDO> topIndustryMap = stockDOS.stream()
-                .collect(Collectors.toMap(e -> e.getIndustry(), e -> e,(e1,e2)->e1));
+                .collect(Collectors.toMap(e -> e.getIndustry(), e -> e, (e1, e2) -> e1));
 
-        List<StockDO> upTopList = stockDao.queryUpTop(100,date);
-        List<StockDO> downTopList = stockDao.queryDownTop(100,date);
+        List<StockDO> upTopList = stockDao.queryUpTop(100, date);
+        List<StockDO> downTopList = stockDao.queryDownTop(100, date);
 
         DataBoardDTO boardDTO = new DataBoardDTO();
         boardDTO.setUpSize(upDownSize.getUpSize());
@@ -339,7 +342,7 @@ public class StockService {
             //满足顺滑上涨要求
             if (needSendNotice) {
                 boolean goodTrend = isGoodTrend(easyMoneyStockDTO);
-                buildNotice(easyMoneyStockDTO, stockHistoryDOList,goodTrend, nowStr);
+                buildNotice(easyMoneyStockDTO, stockHistoryDOList, goodTrend, nowStr);
             }
         }
 
@@ -350,7 +353,7 @@ public class StockService {
         String stockNum = easyMoneyStockDTO.getStockNum();
         int size = 33;
         List<StockDayInfoDO> stockDayInfoDOS = stockDayInfoDao.selectTopN(stockNum, DateUtils.nowDayStr(), size);
-        if (stockDayInfoDOS.size() < size){
+        if (stockDayInfoDOS.size() < size) {
             log.info("数据量太少,忽略:{}", stockNum);
             return false;
         }
@@ -371,8 +374,8 @@ public class StockService {
                 .max(Comparator.comparing(StockDayInfoDO::getClose))
                 .map(e -> e.getClose())
                 .orElse(0D);
-        boolean perfectPosition = maxClose > easyMoneyStockDTO.getClose()*1.2 || easyMoneyStockDTO.getClose() > maxClose;
-        log.info("{}趋势分析结论:macd向上{},cci向上{},资金流入{},价格在低位{}",stockNum,macdUpTrend,cciUpTrend,mainIn,perfectPosition);
+        boolean perfectPosition = maxClose > easyMoneyStockDTO.getClose() * 1.2 || easyMoneyStockDTO.getClose() > maxClose;
+        log.info("{}趋势分析结论:macd向上{},cci向上{},资金流入{},价格在低位{}", stockNum, macdUpTrend, cciUpTrend, mainIn, perfectPosition);
         return macdUpTrend && cciUpTrend && mainIn && perfectPosition;
     }
 
@@ -381,15 +384,15 @@ public class StockService {
         List<List<StockNoticeHistoryDO>> partitions = Lists.partition(historyDOList, 20);
         for (List<StockNoticeHistoryDO> partition : partitions) {
             String noticeAllMsg = partition.stream().map(e -> StockNoticeHistoryAttribute.fromJson(e.getAttribute()))
-                    .map(e -> e.isGoodTrend() ? e.getNoticeMsg()+"**" : e.getNoticeMsg())
+                    .map(e -> e.isGoodTrend() ? e.getNoticeMsg() + "**" : e.getNoticeMsg())
                     .collect(Collectors.joining("\n--------\n"));
             boolean atAll = partition.stream().map(e -> StockNoticeHistoryAttribute.fromJson(e.getAttribute()))
                     .anyMatch(e -> e.isGoodTrend());
-            DingDingUtil.sendMsg(NoticeConfig.stockNoticeToken2, noticeAllMsg,atAll);
+            DingDingUtil.sendMsg(NoticeConfig.stockNoticeToken2, noticeAllMsg, atAll);
         }
     }
 
-    private void buildNotice(EasyMoneyStockDTO stockDTO, List<StockHistoryDO> stockHistoryDOList,boolean goodTrend, String sendLog) {
+    private void buildNotice(EasyMoneyStockDTO stockDTO, List<StockHistoryDO> stockHistoryDOList, boolean goodTrend, String sendLog) {
 
         String noticeDay = DateUtils.nowDayStr();
         StockNoticeHistoryDO noticeHistoryDO = stockNoticeHistoryDao.getByStockNum(stockDTO.getStockNum(), noticeDay);
@@ -499,10 +502,8 @@ public class StockService {
         //按照行业分组排序
         Map<String, List<Long>> allLines = downSizes.stream()
                 .sorted(Comparator.comparing(UpDownSize::getDate))
-                .collect(Collectors.groupingBy(e -> e.getIndustry(), Collectors.mapping(e -> e.getUpSize() * 100L/ e.getAllSize() , Collectors.toList())));
+                .collect(Collectors.groupingBy(e -> e.getIndustry(), Collectors.mapping(e -> e.getUpSize() * 100L / e.getAllSize(), Collectors.toList())));
         List<LineCO> lines = toLines(allLines);
-
-
 
 
         LinesCO linesCO = new LinesCO();
@@ -513,7 +514,7 @@ public class StockService {
     }
 
     private List<LineCO> toLines(Map<String, List<Long>> allLines) {
-        if (MapUtils.isEmpty(allLines)){
+        if (MapUtils.isEmpty(allLines)) {
             return Lists.newArrayList();
         }
         List<LineCO> result = Lists.newArrayList();
@@ -529,10 +530,10 @@ public class StockService {
 
     public LinesCO queryKLine(String industry, List<String> stockNums, String startDate, String endDate) {
 
-        if (StringUtils.isNotBlank(industry)){
+        if (StringUtils.isNotBlank(industry)) {
             List<StockDO> stockDos = stockDao.getByIndustry(industry);
             stockNums = stockDos.stream()
-                    .map(e->e.getStockNum())
+                    .map(e -> e.getStockNum())
                     .collect(Collectors.toList());
         }
 
@@ -557,41 +558,41 @@ public class StockService {
             Map<String, Double> vmap = new HashMap<>();
             double start = 100;
             for (StockDayInfoDO stockDayInfoDO : stockDayInfoDOS) {
-                if (needWave){
+                if (needWave) {
                     start = stockDayInfoDO.getClose();
-                }else {
-                    start = start * (1+stockDayInfoDO.getUpDownRange()/100);
+                } else {
+                    start = start * (1 + stockDayInfoDO.getUpDownRange() / 100);
                 }
                 closePrices.add(start);
-                vmap.put(stockDayInfoDO.getDate(),start);
+                vmap.put(stockDayInfoDO.getDate(), start);
             }
 
             LineCO lineCO = new LineCO();
-            lineCO.setName("收盘价"+stockNum);
+            lineCO.setName("收盘价" + stockNum);
             lineCO.setData(closePrices);
 
             List listTrends = toTrends(stockDayInfoDOS);
             LineCO waveCO = new LineCO();
-            waveCO.setName("波浪"+stockNum);
+            waveCO.setName("波浪" + stockNum);
             waveCO.setData(listTrends);
 
             //异动数据
             List<CommonPair> abnormalDays = stockTimeInfoDao.abnormal(stockNum, startDate, endDate);
-            List<Map<String,Object>> list = new ArrayList<>();
+            List<Map<String, Object>> list = new ArrayList<>();
             for (CommonPair abnormal : abnormalDays) {
-                if (abnormal.getValue() == null){
-                    log.error("some error:{}",abnormal);
+                if (abnormal.getValue() == null) {
+                    log.error("some error:{}", abnormal);
                     continue;
                 }
                 double abValue = (double) abnormal.getValue();
-                if (abValue<15){
+                if (abValue < 15) {
                     continue;
                 }
                 Double v = vmap.get(abnormal.getKey());
                 Map m = new HashMap<>();
-                m.put("xAxis",abnormal.getKey());
-                m.put("yAxis",v);
-                m.put("value",(int)abValue);
+                m.put("xAxis", abnormal.getKey());
+                m.put("yAxis", v);
+                m.put("value", (int) abValue);
                 list.add(m);
             }
             MarkPoint markPoint = new MarkPoint();
@@ -599,7 +600,7 @@ public class StockService {
             lineCO.setMarkPoint(markPoint);
 
             lines.add(lineCO);
-            if (needWave){
+            if (needWave) {
                 lines.add(waveCO);
             }
         }
@@ -611,35 +612,35 @@ public class StockService {
 
     private List<Object[]> toTrends(List<StockDayInfoDO> stockDayInfoDOS) {
         List result = Lists.newArrayList();
-        result.add(new Object[]{stockDayInfoDOS.get(0).getDate(),stockDayInfoDOS.get(0).getClose()});
+        result.add(new Object[]{stockDayInfoDOS.get(0).getDate(), stockDayInfoDOS.get(0).getClose()});
         double[] arr = stockDayInfoDOS.stream()
                 .mapToDouble(e -> e.getClose())
                 .toArray();
         int step = 5;
-        for (int i = 0; i + (step-1)*2 < arr.length; i++) {
-            int maxIdx1 = max(arr, i, i + step-1);
-            int maxIdx2 = max(arr, i + step-1, i + (step-1)*2);
-            if (maxIdx1 == maxIdx2){
+        for (int i = 0; i + (step - 1) * 2 < arr.length; i++) {
+            int maxIdx1 = max(arr, i, i + step - 1);
+            int maxIdx2 = max(arr, i + step - 1, i + (step - 1) * 2);
+            if (maxIdx1 == maxIdx2) {
                 StockDayInfoDO stockDayInfoDO = stockDayInfoDOS.get(maxIdx1);
-                result.add(new Object[]{stockDayInfoDO.getDate(),stockDayInfoDO.getClose()});
+                result.add(new Object[]{stockDayInfoDO.getDate(), stockDayInfoDO.getClose()});
             }
 
-            int minIdx1 = min(arr, i, i + step-1);
-            int minIdx2 = min(arr, i + step-1, i + (step-1)*2);
-            if (minIdx1 == minIdx2){
+            int minIdx1 = min(arr, i, i + step - 1);
+            int minIdx2 = min(arr, i + step - 1, i + (step - 1) * 2);
+            if (minIdx1 == minIdx2) {
                 StockDayInfoDO stockDayInfoDO = stockDayInfoDOS.get(minIdx1);
-                result.add(new Object[]{stockDayInfoDO.getDate(),stockDayInfoDO.getClose()});
+                result.add(new Object[]{stockDayInfoDO.getDate(), stockDayInfoDO.getClose()});
             }
         }
-        result.add(new Object[]{stockDayInfoDOS.get(stockDayInfoDOS.size()-1).getDate(),stockDayInfoDOS.get(stockDayInfoDOS.size()-1).getClose()});
+        result.add(new Object[]{stockDayInfoDOS.get(stockDayInfoDOS.size() - 1).getDate(), stockDayInfoDOS.get(stockDayInfoDOS.size() - 1).getClose()});
 
         return result;
     }
 
     private int max(double[] arr, int start, int end) {
         int max = start;
-        for (;start<arr.length && start<= end;start++){
-            if (arr[max] < arr[start]){
+        for (; start < arr.length && start <= end; start++) {
+            if (arr[max] < arr[start]) {
                 max = start;
             }
         }
@@ -648,8 +649,8 @@ public class StockService {
 
     private int min(double[] arr, int start, int end) {
         int min = start;
-        for (;start<arr.length && start<= end;start++){
-            if (arr[min] > arr[start]){
+        for (; start < arr.length && start <= end; start++) {
+            if (arr[min] > arr[start]) {
                 min = start;
             }
         }
@@ -660,5 +661,43 @@ public class StockService {
         List<StockDayInfoDO> allStockDayInfoDOS = stockDayInfoDao.selectByPeriod(Lists.newArrayList(stockNum), startDate, endDate);
 
         return allStockDayInfoDOS;
+    }
+
+    public void crowBuyQueue() {
+//        if (!isTradeDay()) {
+//            DingDingUtil.sendMsg("", "非交易日，忽略爬取:" + DateUtils.date2String(new Date(), "yyyy-MM-dd HH:mm:ss"));
+//            return;
+//        }
+
+
+        List<StockDO> dbStockDOs = stockDao.selectAll();
+        for (StockDO dbStockDO : dbStockDOs) {
+            try {
+                StockBuyQueueDO stockBuyQueueDO = stockBuyQueueDao.getByStockNum(dbStockDO.getStockNum());
+                StockQueue stockQueue = easyMoneyRepository.crowQueue(dbStockDO.getStockNum());
+                StockBuyQueueDTO stockBuyQueueDTO = StockBuyQueueConvertor.toDTO(stockBuyQueueDO);
+                if (stockBuyQueueDTO == null) {
+                    stockBuyQueueDTO = new StockBuyQueueDTO();
+                    stockBuyQueueDTO.setStockNum(dbStockDO.getStockNum());
+                    stockBuyQueueDTO.setDetail(new HashMap<>());
+                }
+                Map<String, StockBuyQueueDetailDTO> detail = stockBuyQueueDTO.getDetail();
+                detail.put(stockQueue.getBuyOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyOnePrice(), stockQueue.getBuyOne(), "buyOne"));
+                detail.put(stockQueue.getBuyTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyTwoPrice(), stockQueue.getBuyTwo(), "buyTwo"));
+                detail.put(stockQueue.getBuyThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyThreePrice(), stockQueue.getBuyThree(), "buyThree"));
+                detail.put(stockQueue.getBuyFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFourPrice(), stockQueue.getBuyFour(), "buyFour"));
+                detail.put(stockQueue.getBuyFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFivePrice(), stockQueue.getBuyFive(), "buyFive"));
+
+                detail.put(stockQueue.getSoldOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldOnePrice(), stockQueue.getSoldOne(), "soldOne"));
+                detail.put(stockQueue.getSoldTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldTwoPrice(), stockQueue.getSoldTwo(), "soldTwo"));
+                detail.put(stockQueue.getSoldThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldThreePrice(), stockQueue.getSoldThree(), "soldThree"));
+                detail.put(stockQueue.getSoldFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFourPrice(), stockQueue.getSoldFour(), "soldFour"));
+                detail.put(stockQueue.getSoldFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFivePrice(), stockQueue.getSoldFive(), "soldFive"));
+                stockBuyQueueDO = StockBuyQueueConvertor.toDO(stockBuyQueueDTO);
+                stockBuyQueueDao.upsert(stockBuyQueueDO);
+            } catch (Exception e) {
+                log.error("盘口抓取错误:{}", dbStockDO.getStockNum(), e);
+            }
+        }
     }
 }

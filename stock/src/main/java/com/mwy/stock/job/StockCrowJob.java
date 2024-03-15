@@ -65,4 +65,20 @@ public class StockCrowJob {
         stockService.clearHistory();
         log.info("清理正常结束");
     }
+
+    //1分钟检查涨幅通知
+    @Scheduled(cron = "12 * 9,10,11,13,14 * * ?")
+    public void crowBuyQueue() {
+        String nowTime = DateUtils.date2String(new Date(), "HH:mm");
+        boolean inTime = nowTime.compareTo("08:30") > 0 && nowTime.compareTo("15:00") < 0;
+        if (!inTime) {
+            return;
+        }
+        try {
+            stockService.crowBuyQueue();
+            log.info("盘口抓取正常结束");
+        } catch (Exception e) {
+            log.error("盘口抓取异常结束", e);
+        }
+    }
 }
