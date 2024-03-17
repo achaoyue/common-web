@@ -3,10 +3,8 @@ package com.mwy.stock.modal.converter;
 import com.mwy.stock.modal.dto.StockScoreDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
-import com.mwy.stock.reponstory.dao.modal.StockDO;
-import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
-import com.mwy.stock.reponstory.dao.modal.StockHistoryDO;
-import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
+import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockFundDTO;
+import com.mwy.stock.reponstory.dao.modal.*;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
@@ -125,7 +123,7 @@ public class StockConvertor {
     }
 
     public static Double scale(Double d) {
-        if (d == null){
+        if (d == null) {
             return null;
         }
         if (d.isNaN()) {
@@ -144,5 +142,26 @@ public class StockConvertor {
         stockScoreDO.setScoreDesc(scoreDTO.getScoreDesc());
         stockScoreDO.setUpdateDate(scoreDTO.getUpdateDate());
         return stockScoreDO;
+    }
+
+    public static StockFundInfoDO toDO(EasyMoneyStockFundDTO stockFund) {
+        if (stockFund == null) {
+            return null;
+        }
+        StockFundInfoDO stockFundInfoDO = new StockFundInfoDO();
+        stockFundInfoDO.setStockNum(stockFund.getStockNum());
+        stockFundInfoDO.setDate(stockFund.getDate());
+        stockFundInfoDO.setMainMoneyIn(stockFund.getMainMoneyIn());
+        stockFundInfoDO.setMainMoneyOut(stockFund.getMainMoneyOut());
+        stockFundInfoDO.setSuperBigMoneyIn(stockFund.getSuperBigMoneyIn());
+        stockFundInfoDO.setSuperBigMoneyOut(stockFund.getSuperBigMoneyOut());
+        stockFundInfoDO.setBigMoneyIn(stockFund.getBigMoneyIn());
+        stockFundInfoDO.setBigMoneyOut(stockFund.getBigMoneyOut());
+        stockFundInfoDO.setMiddleMoneyIn(stockFund.getMiddleMoneyIn());
+        stockFundInfoDO.setMiddleMoneyOut(stockFund.getMiddleMoneyOut());
+        stockFundInfoDO.setSmallMoneyIn(stockFund.getSmallMoneyIn());
+        stockFundInfoDO.setSmallMoneyOut(stockFund.getSmallMoneyOut());
+        return stockFundInfoDO;
+
     }
 }

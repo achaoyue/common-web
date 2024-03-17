@@ -154,4 +154,10 @@ public class StockController {
         }
         return Result.ofSuccess("ok");
     }
+
+    @GetMapping("/testFund")
+    public Result testFund(@RequestParam("stockNum") String stockNum) {
+        stockService.crowFundInfo(stockNum);
+        return Result.ofSuccess("ok");
+    }
 }

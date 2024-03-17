@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mwy.stock.reponstory.mapper.StockFundInfoMapper">
+    <update id="createTable">
+        CREATE TABLE IF NOT EXISTS stock_fund_info (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `stock_num` varchar(50) DEFAULT NULL COMMENT '股票编码',
+            `date` varchar(50) DEFAULT NULL COMMENT '日期',
+            `main_money_in` double(15, 5) default 0 comment "主力流入金额",
+            `main_money_out` double(15, 5) default 0 comment "主力流出金额",
+            `super_big_money_in` double(15, 5) default 0 comment "超大单流入金额",
+            `super_big_money_out` double(15, 5) default 0 comment "超大单流出",
+            `big_money_in` double(15, 5) default 0 comment "大单流入金额",
+            `big_money_out` double(15, 5) default 0 comment "大单流出金额",
+            `middle_money_in` double(15, 5) default 0 comment "中单流入金额",
+            `middle_money_out` double(15, 5) default 0 comment "中单流出金额",
+            `small_money_in` double(15, 5) default 0 comment "小单流入金额",
+            `small_money_out` double(15, 5) default 0 comment "小单流出金额",
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `idx_stock_num` (`stock_num`,`date`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+    </update>
+</mapper>
+

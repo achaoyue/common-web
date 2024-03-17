@@ -72,6 +72,9 @@ public class StockService {
     @Resource
     private StockBuyQueueDao stockBuyQueueDao;
 
+    @Resource
+    private StockFundDao stockFundDao;
+
     private static boolean STOP = false;
 
     public StockDO get(long id) {
@@ -130,9 +133,21 @@ public class StockService {
             if ("-".equals(moneyStockDTO.getIndustry())) {
                 continue;
             }
+
+            /**
+             * 分时成交抓取
+             */
             stockTimeInfoDao.crowTimeInfo(moneyStockDTO.getStockNum());
+            /**
+             * 每日成交抓取
+             */
             crowStockDayInfo(moneyStockDTO.getStockNum());
+            /**
+             * 资金流向抓取
+             */
+            crowFundInfo(moneyStockDTO.getStockNum());
             log.info("process:{}", i / stockDTOList.size());
+
         }
         DingDingUtil.sendMsg("", "数据爬取完成：" + DateUtils.date2String(new Date(), "yyyy-MM-dd HH:mm:ss"));
     }
@@ -720,5 +735,14 @@ public class StockService {
         } catch (Exception e) {
             log.error("盘口抓取错误:{}", stockNum, e);
         }
+    }
+
+    public void crowFundInfo(String stockNum) {
+        EasyMoneyStockFundDTO stockFund = easyMoneyRepository.getStockFund(stockNum);
+        StockFundInfoDO stockFundInfoDO = StockConvertor.toDO(stockFund);
+        if (stockFundInfoDO == null) {
+            return;
+        }
+        stockFundDao.upsert(stockFundInfoDO);
     }
 }

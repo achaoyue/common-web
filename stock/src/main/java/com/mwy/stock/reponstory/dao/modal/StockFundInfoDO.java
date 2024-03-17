@@ -1,12 +1,19 @@
-package com.mwy.stock.modal.dto.easymoney;
+package com.mwy.stock.reponstory.dao.modal;
 
 import lombok.Data;
+
+import javax.persistence.Table;
 
 /**
  * 股票资金流
  */
 @Data
-public class EasyMoneyStockFundDTO {
+@Table(name = "stock_fund_info")
+public class StockFundInfoDO {
+    /**
+     * id
+     */
+    private Long id;
     /**
      * 股票编码
      */
@@ -64,5 +71,4 @@ public class EasyMoneyStockFundDTO {
      * 小单流出金额
      */
     private Double smallMoneyOut;
-
 }

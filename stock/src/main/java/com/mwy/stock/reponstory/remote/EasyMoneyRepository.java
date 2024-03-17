@@ -11,6 +11,8 @@ import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockFundDTO;
 import com.mwy.stock.modal.dto.easymoney.StockQueue;
 import com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO;
 import java.util.*;
+
+import com.mwy.stock.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -117,12 +119,18 @@ public class EasyMoneyRepository {
         JSONObject map = JSONObject.parseObject(sendResult).getJSONObject("data");
 
         EasyMoneyStockFundDTO stockBean = new EasyMoneyStockFundDTO();
+        stockBean.setStockNum(stockNum);
+        stockBean.setDate(DateUtils.nowDayStr());
         stockBean.setMainMoneyIn(objectToBigDecimal(map.get("f135")));
         stockBean.setMainMoneyOut(objectToBigDecimal(map.get("f136")));
         stockBean.setSuperBigMoneyIn(objectToBigDecimal(map.get("f138")));
         stockBean.setSuperBigMoneyOut(objectToBigDecimal(map.get("f139")));
         stockBean.setBigMoneyIn(objectToBigDecimal(map.get("f141")));
         stockBean.setBigMoneyOut(objectToBigDecimal(map.get("f142")));
+        stockBean.setMiddleMoneyIn(objectToBigDecimal(map.get("f144")));
+        stockBean.setMiddleMoneyOut(objectToBigDecimal(map.get("f145")));
+        stockBean.setSmallMoneyIn(objectToBigDecimal(map.get("f147")));
+        stockBean.setSmallMoneyOut(objectToBigDecimal(map.get("f148")));
 
         return stockBean;
     }
