@@ -76,7 +76,7 @@ public class StockCrowJob {
         }
         try {
             String today = DateUtils.date2String(new Date(), "yyyy-MM-dd");
-            stockService.crowBuyQueue(today);
+            stockService.crowBuyQueue(today, false);
             log.info("盘口抓取正常结束");
         } catch (Exception e) {
             log.error("盘口抓取异常结束", e);

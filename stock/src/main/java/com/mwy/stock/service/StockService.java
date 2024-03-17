@@ -678,8 +678,8 @@ public class StockService {
         return allStockDayInfoDOS;
     }
 
-    public void crowBuyQueue(String today) {
-        if (!isTradeDay()) {
+    public void crowBuyQueue(String today, boolean force) {
+        if (!isTradeDay() && !force) {
             DingDingUtil.sendMsg("", "非交易日，忽略爬取:" + DateUtils.date2String(new Date(), "yyyy-MM-dd HH:mm:ss"));
             return;
         }

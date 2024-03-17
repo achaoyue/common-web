@@ -148,7 +148,7 @@ public class StockController {
     @GetMapping("/testCrowQueue")
     public Result testCrowQueue(@RequestParam("stockNum") String stockNum,@RequestParam("today")  String today) {
         if (StringUtils.isEmpty(stockNum)){
-            stockService.crowBuyQueue(today);
+            stockService.crowBuyQueue(today, true);
         }else {
             stockService.crowQueueByStockNum(today, stockNum);
         }
