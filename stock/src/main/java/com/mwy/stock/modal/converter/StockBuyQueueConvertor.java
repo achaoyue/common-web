@@ -24,6 +24,7 @@ public class StockBuyQueueConvertor {
         StockBuyQueueDO stockBuyQueueDO = new StockBuyQueueDO();
         stockBuyQueueDO.setId(stockBuyQueueDTO.getId());
         stockBuyQueueDO.setStockNum(stockBuyQueueDTO.getStockNum());
+        stockBuyQueueDO.setDate(stockBuyQueueDTO.getDate());
         stockBuyQueueDO.setDetail(JSON.toJSONString(stockBuyQueueDTO.getDetail()));
         return stockBuyQueueDO;
     }

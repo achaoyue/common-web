@@ -21,9 +21,10 @@ public class StockBuyQueueDao extends BaseDao<StockBuyQueueDO, StockBuyQueueMapp
         log.info("stock_buy_queue 创建完成");
     }
 
-    public StockBuyQueueDO getByStockNum(String stockNum) {
+    public StockBuyQueueDO getByStockNum(String stockNum, String date) {
         StockBuyQueueDO stockBuyQueueDO = new StockBuyQueueDO();
         stockBuyQueueDO.setStockNum(stockNum);
+        stockBuyQueueDO.setDate(date);
         return stockBuyQueueMapper.selectOne(stockBuyQueueDO);
     }
 }

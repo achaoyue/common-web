@@ -10,9 +10,7 @@ import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.reponstory.dao.modal.StockNoticeHistoryDO;
 import com.mwy.stock.service.StockService;
 import com.mwy.stock.util.DateUtils;
-import com.mysql.cj.protocol.ResultBuilder;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -145,5 +143,15 @@ public class StockController {
             @RequestParam("endDate") String endDate) {
         List<StockDayInfoDO> data = stockService.queryDayLine(stockNum, startDate, endDate);
         return Result.ofSuccess(data);
+    }
+
+    @GetMapping("/testCrowQueue")
+    public Result testCrowQueue(@RequestParam("stockNum") String stockNum,@RequestParam("today")  String today) {
+        if (StringUtils.isEmpty(stockNum)){
+            stockService.crowBuyQueue(today);
+        }else {
+            stockService.crowQueueByStockNum(today, stockNum);
+        }
+        return Result.ofSuccess("ok");
     }
 }

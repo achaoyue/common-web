@@ -663,41 +663,62 @@ public class StockService {
         return allStockDayInfoDOS;
     }
 
-    public void crowBuyQueue() {
-//        if (!isTradeDay()) {
-//            DingDingUtil.sendMsg("", "非交易日，忽略爬取:" + DateUtils.date2String(new Date(), "yyyy-MM-dd HH:mm:ss"));
-//            return;
-//        }
-
+    public void crowBuyQueue(String today) {
+        if (!isTradeDay()) {
+            DingDingUtil.sendMsg("", "非交易日，忽略爬取:" + DateUtils.date2String(new Date(), "yyyy-MM-dd HH:mm:ss"));
+            return;
+        }
 
         List<StockDO> dbStockDOs = stockDao.selectAll();
         for (StockDO dbStockDO : dbStockDOs) {
-            try {
-                StockBuyQueueDO stockBuyQueueDO = stockBuyQueueDao.getByStockNum(dbStockDO.getStockNum());
-                StockQueue stockQueue = easyMoneyRepository.crowQueue(dbStockDO.getStockNum());
-                StockBuyQueueDTO stockBuyQueueDTO = StockBuyQueueConvertor.toDTO(stockBuyQueueDO);
-                if (stockBuyQueueDTO == null) {
-                    stockBuyQueueDTO = new StockBuyQueueDTO();
-                    stockBuyQueueDTO.setStockNum(dbStockDO.getStockNum());
-                    stockBuyQueueDTO.setDetail(new HashMap<>());
-                }
-                Map<String, StockBuyQueueDetailDTO> detail = stockBuyQueueDTO.getDetail();
-                detail.put(stockQueue.getBuyOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyOnePrice(), stockQueue.getBuyOne(), "buyOne"));
-                detail.put(stockQueue.getBuyTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyTwoPrice(), stockQueue.getBuyTwo(), "buyTwo"));
-                detail.put(stockQueue.getBuyThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyThreePrice(), stockQueue.getBuyThree(), "buyThree"));
-                detail.put(stockQueue.getBuyFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFourPrice(), stockQueue.getBuyFour(), "buyFour"));
-                detail.put(stockQueue.getBuyFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFivePrice(), stockQueue.getBuyFive(), "buyFive"));
+            String stockNum = dbStockDO.getStockNum();
+            crowQueueByStockNum(today, stockNum);
+        }
+    }
 
-                detail.put(stockQueue.getSoldOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldOnePrice(), stockQueue.getSoldOne(), "soldOne"));
-                detail.put(stockQueue.getSoldTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldTwoPrice(), stockQueue.getSoldTwo(), "soldTwo"));
-                detail.put(stockQueue.getSoldThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldThreePrice(), stockQueue.getSoldThree(), "soldThree"));
-                detail.put(stockQueue.getSoldFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFourPrice(), stockQueue.getSoldFour(), "soldFour"));
-                detail.put(stockQueue.getSoldFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFivePrice(), stockQueue.getSoldFive(), "soldFive"));
-                stockBuyQueueDO = StockBuyQueueConvertor.toDO(stockBuyQueueDTO);
-                stockBuyQueueDao.upsert(stockBuyQueueDO);
-            } catch (Exception e) {
-                log.error("盘口抓取错误:{}", dbStockDO.getStockNum(), e);
+    /**
+     * 爬取股票盘口
+     * @param today
+     * @param stockNum
+     */
+    public void crowQueueByStockNum(String today, String stockNum) {
+        try {
+            StockBuyQueueDO stockBuyQueueDO = stockBuyQueueDao.getByStockNum(stockNum, today);
+            StockQueue stockQueue = easyMoneyRepository.crowQueue(stockNum);
+            StockBuyQueueDTO stockBuyQueueDTO = StockBuyQueueConvertor.toDTO(stockBuyQueueDO);
+            if (stockBuyQueueDTO == null) {
+                stockBuyQueueDTO = new StockBuyQueueDTO();
+                stockBuyQueueDTO.setDate(today);
+                stockBuyQueueDTO.setStockNum(stockNum);
+                stockBuyQueueDTO.setDetail(new HashMap<>());
             }
+            Map<String, StockBuyQueueDetailDTO> detail = stockBuyQueueDTO.getDetail();
+            detail.put(stockQueue.getBuyOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyOnePrice(), stockQueue.getBuyOne(), "buyOne", detail));
+            detail.put(stockQueue.getBuyTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyTwoPrice(), stockQueue.getBuyTwo(), "buyTwo", detail));
+            detail.put(stockQueue.getBuyThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyThreePrice(), stockQueue.getBuyThree(), "buyThree",detail));
+            detail.put(stockQueue.getBuyFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFourPrice(), stockQueue.getBuyFour(), "buyFour",detail));
+            detail.put(stockQueue.getBuyFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFivePrice(), stockQueue.getBuyFive(), "buyFive",detail));
+
+            detail.put(stockQueue.getSoldOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldOnePrice(), stockQueue.getSoldOne(), "soldOne",detail));
+            detail.put(stockQueue.getSoldTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldTwoPrice(), stockQueue.getSoldTwo(), "soldTwo",detail));
+            detail.put(stockQueue.getSoldThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldThreePrice(), stockQueue.getSoldThree(), "soldThree",detail));
+            detail.put(stockQueue.getSoldFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFourPrice(), stockQueue.getSoldFour(), "soldFour",detail));
+            detail.put(stockQueue.getSoldFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFivePrice(), stockQueue.getSoldFive(), "soldFive",detail));
+
+            //小于买1的卖清空，大于卖1的买需要清空
+            for (StockBuyQueueDetailDTO detailDTO : detail.values()) {
+                if (detailDTO.getPrice() < stockQueue.getBuyOne() && detailDTO.getType().startsWith("sold")){
+                    detailDTO.setType("");
+                }else if (detailDTO.getPrice() > stockQueue.getBuyOne() && detailDTO.getType().startsWith("buy")){
+                    detailDTO.setType("");
+                }
+            }
+
+            stockBuyQueueDO = StockBuyQueueConvertor.toDO(stockBuyQueueDTO);
+            stockBuyQueueDao.upsert(stockBuyQueueDO);
+            log.info("盘口抓取OK:{}",stockNum);
+        } catch (Exception e) {
+            log.error("盘口抓取错误:{}", stockNum, e);
         }
     }
 }

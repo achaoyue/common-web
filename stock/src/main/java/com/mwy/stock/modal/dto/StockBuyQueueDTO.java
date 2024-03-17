@@ -8,6 +8,7 @@ import java.util.Map;
 public class StockBuyQueueDTO {
     private Long id;
     private String stockNum;
+    private String date;
     private Map<String,StockBuyQueueDetailDTO> detail;
 
 }

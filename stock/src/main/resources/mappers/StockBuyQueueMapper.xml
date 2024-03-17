@@ -4,10 +4,12 @@
     <update id="createTable">
         CREATE TABLE IF NOT EXISTS stock_buy_queue (
             `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `gmt_modify` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
             `stock_num` varchar(50) DEFAULT NULL COMMENT '股票编码',
+            `date` varchar(50) DEFAULT NULL COMMENT '日期',
             `detail` json DEFAULT NULL COMMENT '盘口详情',
             PRIMARY KEY (`id`),
-            UNIQUE KEY `idx_stock_num` (`stock_num`)
+            UNIQUE KEY `idx_stock_num` (`stock_num`,`date`)
             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
     </update>
 </mapper>

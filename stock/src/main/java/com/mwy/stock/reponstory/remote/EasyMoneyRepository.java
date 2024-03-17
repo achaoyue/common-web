@@ -294,6 +294,11 @@ public class EasyMoneyRepository {
         }
     }
 
+    /**
+     * 盘口
+     * @param stockNum
+     * @return
+     */
     public StockQueue crowQueue(String stockNum){
         String url = "http://push2.eastmoney.com/api/qt/stock/get";
 
@@ -360,7 +365,7 @@ public class EasyMoneyRepository {
 
     public static void main(String[] args) {
         EasyMoneyRepository easyMoneyRepository = new EasyMoneyRepository();
-        StockQueue sz000001 = easyMoneyRepository.crowQueue("000001");
+        StockQueue sz000001 = easyMoneyRepository.crowQueue("605580");
         System.out.println(sz000001);
     }
 }
