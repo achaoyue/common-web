@@ -722,9 +722,9 @@ public class StockService {
 
             //小于买1的卖清空，大于卖1的买需要清空
             for (StockBuyQueueDetailDTO detailDTO : detail.values()) {
-                if (detailDTO.getPrice() < stockQueue.getBuyOne() && detailDTO.getType().startsWith("sold")){
+                if (detailDTO.getPrice() < stockQueue.getBuyOnePrice() && detailDTO.getType().startsWith("sold")){
                     detailDTO.setType("");
-                }else if (detailDTO.getPrice() > stockQueue.getSoldOne() && detailDTO.getType().startsWith("buy")){
+                }else if (detailDTO.getPrice() > stockQueue.getSoldOnePrice() && detailDTO.getType().startsWith("buy")){
                     detailDTO.setType("");
                 }
             }
