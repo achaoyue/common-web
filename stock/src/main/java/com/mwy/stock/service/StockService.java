@@ -724,7 +724,7 @@ public class StockService {
             for (StockBuyQueueDetailDTO detailDTO : detail.values()) {
                 if (detailDTO.getPrice() < stockQueue.getBuyOne() && detailDTO.getType().startsWith("sold")){
                     detailDTO.setType("");
-                }else if (detailDTO.getPrice() > stockQueue.getBuyOne() && detailDTO.getType().startsWith("buy")){
+                }else if (detailDTO.getPrice() > stockQueue.getSoldOne() && detailDTO.getType().startsWith("buy")){
                     detailDTO.setType("");
                 }
             }
