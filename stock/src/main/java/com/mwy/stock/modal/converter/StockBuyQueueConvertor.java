@@ -16,6 +16,7 @@ public class StockBuyQueueConvertor {
         StockBuyQueueDTO buyQueueDTO = new StockBuyQueueDTO();
         buyQueueDTO.setId(queueDO.getId());
         buyQueueDTO.setStockNum(queueDO.getStockNum());
+        buyQueueDTO.setDate(queueDO.getDate());
         buyQueueDTO.setDetail(JSON.parseObject(queueDO.getDetail(),new TypeReference<Map<String, StockBuyQueueDetailDTO>>(){}));
         return buyQueueDTO;
     }
