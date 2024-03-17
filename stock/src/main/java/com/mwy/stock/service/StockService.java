@@ -93,8 +93,8 @@ public class StockService {
     /**
      * 抓取股票列表
      */
-    public void crowStock() {
-        if (!isTradeDay()) {
+    public void crowStock(boolean force) {
+        if (!isTradeDay() && !force) {
             DingDingUtil.sendMsg("", "非交易日，忽略爬取:" + DateUtils.date2String(new Date(), "yyyy-MM-dd HH:mm:ss"));
             return;
         }

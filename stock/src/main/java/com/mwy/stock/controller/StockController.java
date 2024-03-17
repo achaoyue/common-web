@@ -45,7 +45,7 @@ public class StockController {
 
     @GetMapping("/crowStock")
     public Result crowStock() {
-        stockService.crowStock();
+        stockService.crowStock(true);
         return Result.ofSuccess(true);
     }
 
