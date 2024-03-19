@@ -157,7 +157,11 @@ public class StockController {
 
     @GetMapping("/testFund")
     public Result testFund(@RequestParam("stockNum") String stockNum) {
-        stockService.crowFundInfo(stockNum);
+        if (StringUtils.isEmpty(stockNum)){
+            stockService.crowAllFundInfo();
+        }else {
+            stockService.crowFundInfo(stockNum);
+        }
         return Result.ofSuccess("ok");
     }
 }
