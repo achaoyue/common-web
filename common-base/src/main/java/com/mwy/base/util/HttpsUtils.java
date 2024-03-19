@@ -123,16 +123,15 @@ public class HttpsUtils {
             i++;
         }
         apiUrl += param;
-        String result = null;
         HttpClient httpClient = null;
         if (apiUrl.startsWith("https")) {
             httpClient = HttpClients.custom().setSSLSocketFactory(createSSLConnSocketFactory())
                     .setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
         } else {
-            httpClient = HttpClients.createDefault();
+            httpClient = HttpClients.custom().setConnectionManager(connMgr)
+                    .setDefaultRequestConfig(requestConfig).build();
         }
-        InputStream instream = null;
-        HttpEntity httpEntity = null;
+        HttpEntity httpEntity;
         try {
             HttpGet httpGet = new HttpGet(apiUrl);
             httpGet.setHeader("Referer", "http://www.sse.com.cn/assortment/stock/list/share/");
