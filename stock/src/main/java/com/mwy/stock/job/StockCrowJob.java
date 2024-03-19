@@ -19,6 +19,7 @@ public class StockCrowJob {
     public void startCrowStock() {
         log.info("开始抓取股票10点");
         stockService.crowStock(false);
+        stockService.crowAllFundInfo();
         log.info("股票抓取正常结束");
     }
 
@@ -26,6 +27,7 @@ public class StockCrowJob {
     public void startCrowStock11() {
         log.info("开始抓取股票11点");
         stockService.crowStock(false);
+        stockService.crowAllFundInfo();
         log.info("股票抓取正常结束");
     }
 
@@ -33,6 +35,7 @@ public class StockCrowJob {
     public void startCrowStock2() {
         log.info("开始抓取股票13点");
         stockService.crowStock(false);
+        stockService.crowAllFundInfo();
         log.info("股票抓取正常结束");
     }
 
@@ -40,6 +43,7 @@ public class StockCrowJob {
     public void startCrowStock3() {
         log.info("开始抓取股票15点");
         stockService.crowStock(false);
+        stockService.crowAllFundInfo();
         log.info("股票抓取正常结束");
     }
 

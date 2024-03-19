@@ -142,10 +142,6 @@ public class StockService {
              * 每日成交抓取
              */
             crowStockDayInfo(moneyStockDTO.getStockNum());
-            /**
-             * 资金流向抓取
-             */
-            crowFundInfo(moneyStockDTO.getStockNum());
             log.info("process:{}", i / stockDTOList.size());
 
         }
@@ -737,6 +733,16 @@ public class StockService {
         }
     }
 
+    public void crowAllFundInfo(){
+        List<StockDO> stockDOS = stockDao.selectAll();
+        double i = 0;
+        for (StockDO stockDO : stockDOS) {
+            i++;
+            crowFundInfo(stockDO.getStockNum());
+            log.info("资金爬取进度:{}",i/stockDOS.size());
+        }
+        DingDingUtil.sendMsg("","资金爬取完成");
+    }
     public void crowFundInfo(String stockNum) {
         EasyMoneyStockFundDTO stockFund = easyMoneyRepository.getStockFund(stockNum);
         StockFundInfoDO stockFundInfoDO = StockConvertor.toDO(stockFund);
