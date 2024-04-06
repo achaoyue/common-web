@@ -676,7 +676,6 @@ public class StockService {
 
     public void crowBuyQueue(String today, boolean force) {
         if (!isTradeDay() && !force) {
-            DingDingUtil.sendMsg("", "非交易日，忽略爬取:" + DateUtils.date2String(new Date(), "yyyy-MM-dd HH:mm:ss"));
             return;
         }
 
@@ -734,6 +733,10 @@ public class StockService {
     }
 
     public void crowAllFundInfo(){
+        if (!isTradeDay()) {
+            return;
+        }
+
         List<StockDO> stockDOS = stockDao.selectAll();
         double i = 0;
         for (StockDO stockDO : stockDOS) {
