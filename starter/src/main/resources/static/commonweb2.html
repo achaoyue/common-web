@@ -69,6 +69,9 @@
     }
     function parseUrlParams(url) {
         const params = {};
+        if (!url || !url.split('?')[1]){
+            return params;
+        }
         const searchParams = url.split('?')[1].split('&');
 
         for (const param of searchParams) {

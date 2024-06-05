@@ -216,6 +216,9 @@
     //url参数解析
     function parseUrlParams(url) {
         const params = {};
+        if (!url || !url.split('?')[1]){
+            return params;
+        }
         const searchParams = url.split('?')[1].split('&');
 
         for (const param of searchParams) {
@@ -442,10 +445,9 @@
                     methods: this.code,
                     dataConfigJson: this.dataConfigJson
                 }
-                let update = true;
+                let update = parseUrlParams(location.href).pageId != null;
                 if (!this.pageId) {
                     this.pageId = randomPageId();
-                    update = false;
                 }
                 let param = {
                     pageId: this.pageId,
