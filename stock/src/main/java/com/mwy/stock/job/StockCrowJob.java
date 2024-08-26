@@ -3,6 +3,7 @@ package com.mwy.stock.job;
 import com.mwy.stock.service.StockService;
 import com.mwy.stock.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(value = "stock.job",havingValue = "true")
 public class StockCrowJob {
     @Resource
     private StockService stockService;

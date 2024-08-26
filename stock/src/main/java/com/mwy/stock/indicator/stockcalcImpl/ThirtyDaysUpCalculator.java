@@ -3,21 +3,16 @@ package com.mwy.stock.indicator.stockcalcImpl;
 import com.mwy.stock.config.CalculatorConsts;
 import com.mwy.stock.indicator.StockCalculator;
 import com.mwy.stock.indicator.TrendsCalculator;
-import com.mwy.stock.indicator.Wave;
-import com.mwy.stock.indicator.enums.TrendEnum;
 import com.mwy.stock.modal.dto.StockScoreDTO;
 import com.mwy.stock.reponstory.dao.StockDayInfoDao;
 import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component(CalculatorConsts.ThirtyDaysUp_Calc)

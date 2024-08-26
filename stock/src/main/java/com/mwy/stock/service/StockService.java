@@ -7,6 +7,7 @@ import com.mwy.base.util.Lock;
 import com.mwy.base.util.db.YesOrNoEnum;
 import com.mwy.stock.config.NoticeConfig;
 import com.mwy.stock.config.SwitchConfig;
+import com.mwy.stock.indicator.Wave;
 import com.mwy.stock.indicator.indicatorImpl.IndicatorProxy;
 import com.mwy.stock.modal.co.CommonPair;
 import com.mwy.stock.modal.co.LineCO;
@@ -607,8 +608,8 @@ public class StockService {
                 list.add(m);
             }
             MarkPoint markPoint = new MarkPoint();
-            markPoint.setData(list);
-            lineCO.setMarkPoint(markPoint);
+//            markPoint.setData(list);
+//            lineCO.setMarkPoint(markPoint);
 
             lines.add(lineCO);
             if (needWave) {
@@ -681,6 +682,9 @@ public class StockService {
 
         List<StockDO> dbStockDOs = stockDao.selectAll();
         for (StockDO dbStockDO : dbStockDOs) {
+            if ("-".equals(dbStockDO.getIndustry())) {
+                continue;
+            }
             String stockNum = dbStockDO.getStockNum();
             crowQueueByStockNum(today, stockNum);
         }
@@ -741,6 +745,9 @@ public class StockService {
         double i = 0;
         for (StockDO stockDO : stockDOS) {
             i++;
+            if ("-".equals(stockDO.getIndustry())) {
+                continue;
+            }
             crowFundInfo(stockDO.getStockNum());
             log.info("资金爬取进度:{}",i/stockDOS.size());
         }
@@ -753,5 +760,44 @@ public class StockService {
             return;
         }
         stockFundDao.upsert(stockFundInfoDO);
+    }
+
+    public List<CommonPair<Double>> sameStock(String stockNum, String startDate, String endDate) {
+        //目标
+        List<StockDayInfoDO> stockDayInfoDOS = queryDayLine(stockNum, startDate, endDate);
+        double[] sourceArr = stockDayInfoDOS.stream().mapToDouble(e -> e.getClose()).toArray();
+
+        //全量股
+        List<StockDO> dbStockDOs = stockDao.selectAll();
+
+        //遍历个股，查k
+        //计算相似度。收集大于0.7的股票
+        List<CommonPair<Double>> sameStockList = Lists.newArrayList();
+        for (StockDO dbStockDO : dbStockDOs) {
+            if ("-".equals(dbStockDO.getIndustry())) {
+                continue;
+            }
+            int lastDay = 5;
+            List<StockDayInfoDO> infoDOS = stockDayInfoDao.selectBigN(dbStockDO.getStockNum(), startDate, stockDayInfoDOS.size() + lastDay);
+            if (infoDOS.size() < stockDayInfoDOS.size()){
+                continue;
+            }
+            List<StockDayInfoDO> dayInfoDOS = infoDOS.subList(infoDOS.size() - stockDayInfoDOS.size(),infoDOS.size());
+            double[] targetArr = dayInfoDOS.stream().mapToDouble(e -> e.getClose()).toArray();
+            if (sourceArr.length != targetArr.length){
+                log.info("不一样长，忽略计算。{}", dbStockDO.getStockNum());
+                continue;
+            }
+            double similarity = Wave.calculateSimilarity(sourceArr, targetArr);
+            if (similarity > 0.7){
+                sameStockList.add(CommonPair.of(dbStockDO.getStockNum(), similarity));
+                sameStockList.sort(Comparator.comparing(e->e.getValue()));
+            }
+
+        }
+        String allStr = sameStockList.stream().map(e -> e.getKey())
+                .collect(Collectors.joining("\n"));
+        System.out.println(allStr);
+        return sameStockList;
     }
 }

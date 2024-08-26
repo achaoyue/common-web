@@ -164,4 +164,12 @@ public class StockController {
         }
         return Result.ofSuccess("ok");
     }
+
+    @GetMapping("/sameStock")
+    public Result querySameStock(@RequestParam("stockNum") String stockNum,
+                                 @RequestParam("startDate") String startDate,
+                                 @RequestParam("endDate") String endDate){
+        List list = stockService.sameStock(stockNum, startDate, endDate);
+        return Result.ofSuccess(list);
+    }
 }

@@ -29,8 +29,15 @@ public class EasyMoneyTest {
 //        EasyMoneyStockFundDTO stockFund = easyMoneyRepository.getStockFund("603163");
 //        System.out.println(JSON.toJSONString(stockFund));
 //        System.out.println(JSON.toJSON(stockListByScript));
-        List<StockTimeInfoDO> stockTimeInfoDOS = easyMoneyRepository.crawlStockTimeInfoList("600388");
-        System.out.println(JSON.toJSON(stockTimeInfoDOS));
+//        List<StockTimeInfoDO> stockTimeInfoDOS = easyMoneyRepository.crawlStockTimeInfoList("600388");
+//        System.out.println(JSON.toJSON(stockTimeInfoDOS));
+
+//        List<EasyMoneyStockDTO> stockListByScript = easyMoneyRepository.getStockListByScript();
+//        System.out.println(JSON.toJSON(stockListByScript));
+
+        EasyMoneyStockFundDTO stockFund = easyMoneyRepository.getStockFund("600104");
+        System.out.println(stockFund);
+
 
     }
 

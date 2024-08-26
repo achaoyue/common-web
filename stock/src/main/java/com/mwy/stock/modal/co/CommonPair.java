@@ -3,11 +3,11 @@ package com.mwy.stock.modal.co;
 import lombok.Data;
 
 @Data
-public class CommonPair {
+public class CommonPair<T> {
     private String key;
-    private Object value;
+    private T value;
 
-    public static CommonPair of(String key, Object value){
+    public static <T> CommonPair of(String key, T value){
         CommonPair commonPair = new CommonPair();
         commonPair.setKey(key);
         commonPair.setValue(value);
