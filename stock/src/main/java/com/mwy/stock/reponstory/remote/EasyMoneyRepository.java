@@ -114,25 +114,30 @@ public class EasyMoneyRepository {
         } else {
             param.put("secid", "1." + stockNum);
         }
-        
-        String sendResult = HttpsUtils.doGetString(url, param);
-        JSONObject map = JSONObject.parseObject(sendResult).getJSONObject("data");
 
-        EasyMoneyStockFundDTO stockBean = new EasyMoneyStockFundDTO();
-        stockBean.setStockNum(stockNum);
-        stockBean.setDate(DateUtils.nowDayStr());
-        stockBean.setMainMoneyIn(objectToBigDecimal(map.get("f135")));
-        stockBean.setMainMoneyOut(objectToBigDecimal(map.get("f136")));
-        stockBean.setSuperBigMoneyIn(objectToBigDecimal(map.get("f138")));
-        stockBean.setSuperBigMoneyOut(objectToBigDecimal(map.get("f139")));
-        stockBean.setBigMoneyIn(objectToBigDecimal(map.get("f141")));
-        stockBean.setBigMoneyOut(objectToBigDecimal(map.get("f142")));
-        stockBean.setMiddleMoneyIn(objectToBigDecimal(map.get("f144")));
-        stockBean.setMiddleMoneyOut(objectToBigDecimal(map.get("f145")));
-        stockBean.setSmallMoneyIn(objectToBigDecimal(map.get("f147")));
-        stockBean.setSmallMoneyOut(objectToBigDecimal(map.get("f148")));
+        try {
+            String sendResult = HttpsUtils.doGetString(url, param);
+            JSONObject map = JSONObject.parseObject(sendResult).getJSONObject("data");
 
-        return stockBean;
+            EasyMoneyStockFundDTO stockBean = new EasyMoneyStockFundDTO();
+            stockBean.setStockNum(stockNum);
+            stockBean.setDate(DateUtils.nowDayStr());
+            stockBean.setMainMoneyIn(objectToBigDecimal(map.get("f135")));
+            stockBean.setMainMoneyOut(objectToBigDecimal(map.get("f136")));
+            stockBean.setSuperBigMoneyIn(objectToBigDecimal(map.get("f138")));
+            stockBean.setSuperBigMoneyOut(objectToBigDecimal(map.get("f139")));
+            stockBean.setBigMoneyIn(objectToBigDecimal(map.get("f141")));
+            stockBean.setBigMoneyOut(objectToBigDecimal(map.get("f142")));
+            stockBean.setMiddleMoneyIn(objectToBigDecimal(map.get("f144")));
+            stockBean.setMiddleMoneyOut(objectToBigDecimal(map.get("f145")));
+            stockBean.setSmallMoneyIn(objectToBigDecimal(map.get("f147")));
+            stockBean.setSmallMoneyOut(objectToBigDecimal(map.get("f148")));
+
+            return stockBean;
+        } catch (Exception e) {
+            log.error("资金流爬取失败:{}", param, e);
+            throw e;
+        }
     }
 
     /**
