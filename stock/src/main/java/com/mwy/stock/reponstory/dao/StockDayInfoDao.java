@@ -80,7 +80,7 @@ public class StockDayInfoDao extends BaseDao<StockDayInfoDO, StockDayInfoMapper>
 
     public int bigThan(String date) {
         WeekendSqls<StockDayInfoDO> sqls = WeekendSqls.custom();
-        sqls.andEqualTo(StockDayInfoDO::getStockNum, "600479");
+        sqls.andEqualTo(StockDayInfoDO::getStockNum, "601398");
         sqls.andGreaterThan(StockDayInfoDO::getDate, date);
         Example example = Example.builder(StockDayInfoDO.class)
                 .where(sqls)
