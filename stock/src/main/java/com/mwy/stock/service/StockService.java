@@ -2,6 +2,7 @@ package com.mwy.stock.service;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import com.mwy.base.co.Result;
 import com.mwy.base.util.DingDingUtil;
 import com.mwy.base.util.Lock;
 import com.mwy.base.util.db.YesOrNoEnum;
@@ -692,6 +693,7 @@ public class StockService {
 
     /**
      * 爬取股票盘口
+     *
      * @param today
      * @param stockNum
      */
@@ -709,34 +711,40 @@ public class StockService {
             Map<String, StockBuyQueueDetailDTO> detail = stockBuyQueueDTO.getDetail();
             detail.put(stockQueue.getBuyOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyOnePrice(), stockQueue.getBuyOne(), "buyOne", detail));
             detail.put(stockQueue.getBuyTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyTwoPrice(), stockQueue.getBuyTwo(), "buyTwo", detail));
-            detail.put(stockQueue.getBuyThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyThreePrice(), stockQueue.getBuyThree(), "buyThree",detail));
-            detail.put(stockQueue.getBuyFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFourPrice(), stockQueue.getBuyFour(), "buyFour",detail));
-            detail.put(stockQueue.getBuyFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFivePrice(), stockQueue.getBuyFive(), "buyFive",detail));
+            detail.put(stockQueue.getBuyThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyThreePrice(), stockQueue.getBuyThree(), "buyThree", detail));
+            detail.put(stockQueue.getBuyFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFourPrice(), stockQueue.getBuyFour(), "buyFour", detail));
+            detail.put(stockQueue.getBuyFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getBuyFivePrice(), stockQueue.getBuyFive(), "buyFive", detail));
 
-            detail.put(stockQueue.getSoldOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldOnePrice(), stockQueue.getSoldOne(), "soldOne",detail));
-            detail.put(stockQueue.getSoldTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldTwoPrice(), stockQueue.getSoldTwo(), "soldTwo",detail));
-            detail.put(stockQueue.getSoldThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldThreePrice(), stockQueue.getSoldThree(), "soldThree",detail));
-            detail.put(stockQueue.getSoldFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFourPrice(), stockQueue.getSoldFour(), "soldFour",detail));
-            detail.put(stockQueue.getSoldFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFivePrice(), stockQueue.getSoldFive(), "soldFive",detail));
+            detail.put(stockQueue.getSoldOnePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldOnePrice(), stockQueue.getSoldOne(), "soldOne", detail));
+            detail.put(stockQueue.getSoldTwoPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldTwoPrice(), stockQueue.getSoldTwo(), "soldTwo", detail));
+            detail.put(stockQueue.getSoldThreePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldThreePrice(), stockQueue.getSoldThree(), "soldThree", detail));
+            detail.put(stockQueue.getSoldFourPrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFourPrice(), stockQueue.getSoldFour(), "soldFour", detail));
+            detail.put(stockQueue.getSoldFivePrice().toString(), StockBuyQueueDetailDTO.build(stockQueue.getSoldFivePrice(), stockQueue.getSoldFive(), "soldFive", detail));
+
+            //如果价格为0，忽略更新
+            if (detail.containsKey("0")) {
+                log.info("爬取结果中，含有价格为0的情况。{}", detail);
+                detail.remove("0");
+            }
 
             //小于买1的卖清空，大于卖1的买需要清空
             for (StockBuyQueueDetailDTO detailDTO : detail.values()) {
-                if (detailDTO.getPrice() < stockQueue.getBuyOnePrice() && detailDTO.getType().startsWith("sold")){
+                if (detailDTO.getPrice() != 0 && detailDTO.getPrice() < stockQueue.getBuyOnePrice() && detailDTO.getType().startsWith("sold")) {
                     detailDTO.setType("");
-                }else if (detailDTO.getPrice() > stockQueue.getSoldOnePrice() && detailDTO.getType().startsWith("buy")){
+                } else if (detailDTO.getPrice() != 0 && detailDTO.getPrice() > stockQueue.getSoldOnePrice() && detailDTO.getType().startsWith("buy")) {
                     detailDTO.setType("");
                 }
             }
 
             stockBuyQueueDO = StockBuyQueueConvertor.toDO(stockBuyQueueDTO);
             stockBuyQueueDao.upsert(stockBuyQueueDO);
-            log.info("盘口抓取OK:{}",stockNum);
+            log.info("盘口抓取OK:{}", stockNum);
         } catch (Exception e) {
             log.error("盘口抓取错误:{}", stockNum, e);
         }
     }
 
-    public void crowAllFundInfo(){
+    public void crowAllFundInfo() {
         if (!isTradeDay()) {
             return;
         }
@@ -749,10 +757,11 @@ public class StockService {
                 continue;
             }
             crowFundInfo(stockDO.getStockNum());
-            log.info("资金爬取进度:{}",i/stockDOS.size());
+            log.info("资金爬取进度:{}", i / stockDOS.size());
         }
-        DingDingUtil.sendMsg("","资金爬取完成");
+        DingDingUtil.sendMsg("", "资金爬取完成");
     }
+
     public void crowFundInfo(String stockNum) {
         EasyMoneyStockFundDTO stockFund = easyMoneyRepository.getStockFund(stockNum);
         StockFundInfoDO stockFundInfoDO = StockConvertor.toDO(stockFund);
@@ -779,19 +788,19 @@ public class StockService {
             }
             int lastDay = 5;
             List<StockDayInfoDO> infoDOS = stockDayInfoDao.selectBigN(dbStockDO.getStockNum(), startDate, stockDayInfoDOS.size() + lastDay);
-            if (infoDOS.size() < stockDayInfoDOS.size()){
+            if (infoDOS.size() < stockDayInfoDOS.size()) {
                 continue;
             }
-            List<StockDayInfoDO> dayInfoDOS = infoDOS.subList(infoDOS.size() - stockDayInfoDOS.size(),infoDOS.size());
+            List<StockDayInfoDO> dayInfoDOS = infoDOS.subList(infoDOS.size() - stockDayInfoDOS.size(), infoDOS.size());
             double[] targetArr = dayInfoDOS.stream().mapToDouble(e -> e.getClose()).toArray();
-            if (sourceArr.length != targetArr.length){
+            if (sourceArr.length != targetArr.length) {
                 log.info("不一样长，忽略计算。{}", dbStockDO.getStockNum());
                 continue;
             }
             double similarity = Wave.calculateSimilarity(sourceArr, targetArr);
-            if (similarity > 0.7){
+            if (similarity > 0.7) {
                 sameStockList.add(CommonPair.of(dbStockDO.getStockNum(), similarity));
-                sameStockList.sort(Comparator.comparing(e->e.getValue()));
+                sameStockList.sort(Comparator.comparing(e -> e.getValue()));
             }
 
         }
@@ -799,5 +808,24 @@ public class StockService {
                 .collect(Collectors.joining("\n"));
         System.out.println(allStr);
         return sameStockList;
+    }
+
+    public Result detail(String stockNum, String startDate, String endDate) {
+        StockDO stockDO = stockDao.getByStockNum(stockNum);
+        List<StockDayInfoDO> stockDayInfoDOS = queryDayLine(stockNum, startDate, endDate);
+
+        //资金流入
+        StockFundInfoDO fundInfoDO = stockFundDao.getByStockNum(stockNum, endDate);
+
+        //最近有异动
+        double abnormal = stockTimeInfoDao.abnormal(stockNum, Lists.newArrayList(endDate));
+
+        HashMap<Object, Object> hashMap = new HashMap<>();
+        hashMap.put("stockDO", stockDO);
+        hashMap.put("stockDayInfoDOS", stockDayInfoDOS);
+        hashMap.put("fundInfoDO", fundInfoDO);
+        hashMap.put("abnormal", abnormal);
+
+        return Result.ofSuccess(hashMap);
     }
 }

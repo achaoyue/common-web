@@ -20,4 +20,11 @@ public class StockFundDao extends BaseDao<StockFundInfoDO, StockFundInfoMapper> 
         stockFundInfoMapper.createTable();
         log.info("StockFundInfoDO 创建完成");
     }
+
+    public StockFundInfoDO getByStockNum(String stockNum, String date){
+        StockFundInfoDO query = new StockFundInfoDO();
+        query.setStockNum(stockNum);
+        query.setDate(date);
+        return selectOne(query);
+    }
 }

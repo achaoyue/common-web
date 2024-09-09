@@ -172,4 +172,12 @@ public class StockController {
         List list = stockService.sameStock(stockNum, startDate, endDate);
         return Result.ofSuccess(list);
     }
+
+    @GetMapping("/detail")
+    public Result queryDetail(@RequestParam("stockNum") String stockNum,
+                                 @RequestParam("startDate") String startDate,
+                                 @RequestParam("endDate") String endDate){
+        Result result = stockService.detail(stockNum, startDate, endDate);
+        return result;
+    }
 }

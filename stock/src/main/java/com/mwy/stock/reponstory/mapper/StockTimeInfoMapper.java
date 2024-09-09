@@ -19,7 +19,7 @@ public interface StockTimeInfoMapper {
 
     int insertByTables(@Param("timeInfoDOs") List<StockTimeInfoDO> timeInfoDO, @Param("stockNum") String stockNum);
 
-    double abnormal(@Param("stockNum") String stockNum, @Param("dates") List<String> date);
+    Double abnormal(@Param("stockNum") String stockNum, @Param("dates") List<String> date);
 
     List<StockTimeInfoDO> selectByDate(@Param("stockNum") String stockNum, @Param("date") String date);
 

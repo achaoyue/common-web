@@ -45,7 +45,11 @@ public class StockTimeInfoDao implements InitializingBean {
     }
 
     public double abnormal(String stockNum, List<String> dates) {
-        return stockTimeInfoMapper.abnormal(stockNum, dates);
+        Double abnormal = stockTimeInfoMapper.abnormal(stockNum, dates);
+        if (abnormal == null){
+            return Double.valueOf(-1);
+        }
+        return abnormal.doubleValue();
     }
 
     public List<CommonPair> abnormal(String stockNum, String startDate, String endDate) {

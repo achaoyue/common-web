@@ -16,6 +16,7 @@ import com.mwy.stock.reponstory.dao.StockDayInfoDao;
 import com.mwy.stock.reponstory.dao.StockScoreDao;
 import com.mwy.stock.reponstory.dao.StockScoreStrategyDao;
 import com.mwy.stock.reponstory.dao.modal.StockDO;
+import com.mwy.stock.reponstory.dao.modal.StockDayInfoDO;
 import com.mwy.stock.reponstory.dao.modal.StockScoreDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -149,12 +150,14 @@ public class StockCalcService {
         Page<Object> page = PageHelper.startPage(qry.getPageNum(), qry.getPageSize());
         List<StockScoreDO> stockScoreDOS = stockScoreDao.selectByExample(example);
 
+        List<StockDayInfoDO> dayInfoDOS = stockDayInfoDao.selectByDate(qry.getDate());
+
         List<String> stockNums = stockScoreDOS.stream()
                 .map(StockScoreDO::getStockNum)
                 .collect(Collectors.toList());
         List<StockDO> stockDOS = stockDao.getByStockNums(stockNums);
 
-        List<StockScoreCO> list = StockScoreConvetor.toCO(stockScoreDOS,stockDOS);
+        List<StockScoreCO> list = StockScoreConvetor.toCO(stockScoreDOS,stockDOS,dayInfoDOS);
         return PageResult.ofSuccess(list,qry.getPageNum(),qry.getPageSize(),page.getTotal());
     }
 }

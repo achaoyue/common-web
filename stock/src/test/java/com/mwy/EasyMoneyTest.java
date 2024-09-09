@@ -1,6 +1,7 @@
 package com.mwy;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockDayInfoDTO;
 import com.mwy.stock.modal.dto.easymoney.EasyMoneyStockFundDTO;
 import com.mwy.stock.reponstory.dao.modal.StockTimeInfoDO;
@@ -10,6 +11,7 @@ import com.mwy.stock.util.DateUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EasyMoneyTest {
     public static void main(String[] args) {
@@ -38,6 +40,12 @@ public class EasyMoneyTest {
         EasyMoneyStockFundDTO stockFund = easyMoneyRepository.getStockFund("600104");
         System.out.println(stockFund);
 
+        List<EasyMoneyStockDTO> stockListByScript = easyMoneyRepository.getStockListByScript();
+        List collect = stockListByScript.stream()
+                .filter(e -> e.getUpDownRange() > 7)
+                .map(e->e.getStockName())
+                .collect(Collectors.toList());
+        System.out.println(JSON.toJSONString(collect, SerializerFeature.PrettyFormat));
 
     }
 

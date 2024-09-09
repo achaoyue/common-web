@@ -14,6 +14,8 @@ import java.util.*;
 
 import com.mwy.stock.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 
@@ -32,6 +34,7 @@ public class EasyMoneyRepository {
      * @param stockNum
      * @return
      */
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 2000L, multiplier = 1.5))
     public List<EasyMoneyStockDayInfoDTO> crawlStockDayInfoListByStockBean(String stockNum) {
         String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get";
         Map<String, Object> param = new HashMap<String, Object>();
@@ -48,7 +51,7 @@ public class EasyMoneyRepository {
         } else {
             param.put("secid", "1." + stockNum);
         }
-        param.put("beg", "20220101");
+        param.put("beg", "20240101");
         param.put("end", "20500000");
         String sendResult = HttpsUtils.doGetString(url, param);
 
@@ -97,6 +100,7 @@ public class EasyMoneyRepository {
      * @param stockNum
      * @return
      */
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 2000L, multiplier = 1.5))
     public EasyMoneyStockFundDTO getStockFund(String stockNum){
         String url = "http://push2.eastmoney.com/api/qt/stock/get";
 
@@ -144,6 +148,7 @@ public class EasyMoneyRepository {
      * 全量股票
      * @return
      */
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 2000L, multiplier = 1.5))
     public List<EasyMoneyStockDTO> getStockListByScript() {
         String url = "http://19.push2.eastmoney.com/api/qt/clist/get";
 
@@ -245,6 +250,7 @@ public class EasyMoneyRepository {
      * @param stockNum
      * @return
      */
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 2000L, multiplier = 1.5))
     public List<StockTimeInfoDO> crawlStockTimeInfoList(String stockNum) {
         String url = "http://push2his.eastmoney.com/api/qt/stock/trends2/get";
         //String param = "begin=0&end=-1&select=time,price,volume";
@@ -312,6 +318,7 @@ public class EasyMoneyRepository {
      * @param stockNum
      * @return
      */
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 2000L, multiplier = 1.5))
     public StockQueue crowQueue(String stockNum){
         String url = "http://push2.eastmoney.com/api/qt/stock/get";
 
