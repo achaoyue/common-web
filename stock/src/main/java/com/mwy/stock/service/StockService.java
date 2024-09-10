@@ -609,8 +609,8 @@ public class StockService {
                 list.add(m);
             }
             MarkPoint markPoint = new MarkPoint();
-//            markPoint.setData(list);
-//            lineCO.setMarkPoint(markPoint);
+            markPoint.setData(list);
+            lineCO.setMarkPoint(markPoint);
 
             lines.add(lineCO);
             if (needWave) {

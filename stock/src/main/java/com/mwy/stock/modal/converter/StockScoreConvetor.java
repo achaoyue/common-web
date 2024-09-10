@@ -35,7 +35,7 @@ public class StockScoreConvetor {
         stockScoreCO.setScoreDesc(stockScoreDO.getScoreDesc());
 
         if (stockDO != null){
-            stockScoreCO.setUpDownRange(dayInfoDO.getUpDownRange());
+            stockScoreCO.setUpDownRange(stockDO.getUpDownRange());
             stockScoreCO.setTotalFlowShares(stockDO.getTotalFlowShares());
             stockScoreCO.setTotalMarketValue(stockDO.getTotalMarketValue());
             stockScoreCO.setTotalShares(stockDO.getTotalShares());
@@ -44,6 +44,9 @@ public class StockScoreConvetor {
             stockScoreCO.setPlate(stockDO.getPlate());
             stockScoreCO.setBelongPlate(stockDO.getBelongPlate());
             stockScoreCO.setFavorite(stockDO.getFavorite());
+        }
+        if (dayInfoDO != null){
+            stockScoreCO.setUpDownRange(dayInfoDO.getUpDownRange());
         }
 
         return stockScoreCO;
